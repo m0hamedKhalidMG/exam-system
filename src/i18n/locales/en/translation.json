@@ -1,0 +1,281 @@
+{
+  "navbar": {
+    "title": "Math Mastery",
+    "admin": "Admin",
+    "logout": "Logout",
+    "profile": "Profile",
+    "home":"home",
+    "history":"history",
+    "english": "English",
+    "arabic": "Arabic",
+    "selectLanguage": "Select Language"
+  },
+  "adminBestStudents": {
+    "title": "Top Students",
+    "averageScore": "Average Score",
+    "age": "Age",
+    "email": "Email"
+  },
+  "whatsAppGroup": {
+    "title": "Join WhatsApp Group",
+    "description": "Joining the WhatsApp group is mandatory to proceed with the exam.",
+    "button": "Join Group"
+  },
+  "adminHub": {
+    "welcome": "Welcome, Admin",
+    "prompt": "What would you like to do today?",
+    "manageDashboard": "Manage Dashboard",
+    "goToDashboard": "Go to Dashboard",
+    "viewBestStudents": "View Best Students",
+    "viewStudentsAndCharts": "View Students & Charts"
+  },
+  "adminLogin": {
+    "title": "Admin Login",
+    "username": "Username",
+    "password": "Password",
+    "loginButton": "Login",
+    "invalidCredentials": "Invalid username or password!"
+  },
+  "adminViewStudents": {
+    "title": "All Students",
+    "downloadButton": "Download PDF Report",
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "age": "Age",
+      "blocked": "Blocked",
+      "actions": "Actions"
+    },
+    "status": {
+      "yes": "Yes",
+      "no": "No",
+      "blocked": "Blocked",
+      "active": "Active"
+    },
+    "alerts": {
+      "blocked": "Student has been blocked.",
+      "unblocked": "Student has been unblocked."
+    },
+    "pdf": {
+      "title": "Student Details Report",
+      "details": "Name: {{name}}, Age: {{age}}, Email: {{email}}, Phone: {{phone}}, Blocked: {{blocked}}",
+      "fileName": "students_report.pdf"
+    },
+    "chart": {
+      "performanceTitle": "Student Performance (Exams Taken, Passed, Average Score)",
+      "blockedTitle": "Blocked vs Active Students",
+      "labels": {
+        "student": "Student",
+        "examsTaken": "Exams Taken",
+        "examsPassed": "Exams Passed",
+        "averageScore": "Average Score",
+        "status": "Status",
+        "count": "Count",
+        "countScore": "Count/Score"
+      }
+    }
+  },
+  "examInstructions": {
+    "title": "Exam Instructions",
+    "levelInfo": "You are about to take the Level {{level}} exam.",
+    "duration": "The total duration of this exam is {{duration}}.",
+    "minutes": "minutes",
+    "notSpecified": "not specified.",
+    "quietEnvironment": "Please make sure you are in a quiet and distraction-free environment.",
+    "readQuestions": "Read each question carefully before answering.",
+    "navigateQuestions": "You can navigate between questions using the Next and Back buttons.",
+    "noChangesAfterSubmit": "Once you submit your answers, you cannot change them.",
+    "scoreDisplayed": "Your score will be calculated and displayed immediately after submission.",
+    "startButton": "Start Exam"
+  },
+  "examPage": {
+    "title": "Exam - Level {{level}}",
+    "timeRemaining": "Time Remaining: {{time}}",
+    "noProfile": "Profile Not Found",
+    "registerButton": "Register",
+    "noExams": "No Exams Available",
+    "checkBack": "Please check back later.",
+    "yourAnswer": "Your Answer",
+    "backButton": "Back",
+    "nextButton": "Next",
+    "submitButton": "Submit",
+    "timeUpAlert": "Time is up! Submitting your answers.",
+    "noQuestions": "No Questions Available",
+    "questionCount": "Question {{current}} / {{total}}"
+  },
+  "examResult": {
+    "title": "🎯 Exam Result",
+    "name": "Name",
+    "level": "Level",
+    "score": "Score",
+    "feedbackTitle": "Feedback",
+    "feedback": {
+      "excellent": "🌟 Excellent work!",
+      "good": "👍 Good job! Keep improving!",
+      "practice": "💪 Keep practicing, you can do better!"
+    },
+    "questionBreakdown": "📝 Question Breakdown",
+    "question": "Q",
+    "yourAnswer": "Your Answer",
+    "correctAnswer": "Correct Answer",
+    "correct": "✅ Correct",
+    "incorrect": "❌ Incorrect",
+    "viewHistoryButton": "View History"
+  },
+  "homePage": {
+    "welcomeTitle": "Welcome to Math Mastery",
+    "welcomeSubtitle": "Unlock the power of math with precision and style.",
+    "adminWelcome": "Welcome, Admin",
+    "adminDescription": "Manage the platform and view performance metrics.",
+    "adminButton": "Go to Admin Hub",
+    "studentReady": "Ready for Your Next Exam?",
+    "studentDescription": "Continue your learning journey.",
+    "studentButton": "Take Exam",
+    "adminAccessTitle": "Admin Access",
+    "adminAccessDescription": "Manage questions, exams, and student performance in one place.",
+    "adminAccessButton": "Admin Login",
+    "studentHubTitle": "Student Hub",
+    "studentHubDescription": "Register to join exciting math challenges and track your progress.",
+    "studentHubButton": "Register Now"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "rank": "Rank",
+    "name": "Name",
+    "score": "Score"
+  },
+  "levelSelection": {
+    "title": "Select Your Exam",
+    "subtitle": "Follow the steps to choose your exam based on your age and level.",
+    "step1": "Step 1: Choose Age Group",
+    "step2": "Step 2: Choose Level",
+    "ageGroup": {
+      "7": "7 Years",
+      "7-10": "7-10 Years",
+      "10+": "10+ Years"
+    },
+    "level": "Level",
+    "back": "Back to Age Selection",
+    "noExamsAlert": "No exams available for this level and age group!"
+  },
+  "studentHistory": {
+    "title": "📜 Exam History",
+    "noHistory": "No history available. 🧐 Take an exam to view your progress.",
+    "recordsTitle": "Your Exam Records 📘",
+    "level": "Level",
+    "score": "Score",
+    "viewDetails": "View Details",
+    "modalTitle": "Exam Details 📝",
+    "yourAnswer": "Your Answer",
+    "correctAnswer": "Correct Answer",
+    "closeButton": "Close"
+  },
+  "studentLogin": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Login",
+    "registerPrompt": "Don't have an account? Register here.",
+    "invalidCredentials": "Invalid email or password."
+  },
+  "studentProfile": {
+    "viewTitle": "Your Profile",
+    "editTitle": "Edit Your Profile",
+    "noProfileFound": "No profile found. Please register or log in.",
+    "fields": {
+      "name": "Name",
+      "age": "Age",
+      "country": "Country",
+      "province": "State",
+      "whatsappNumber": "Phone"
+    },
+    "editButton": "Edit Profile",
+    "saveButton": "Save Changes",
+    "cancelButton": "Cancel"
+  },
+  "studentRegistration": {
+    "title": "Student Registration",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "age": "Age",
+      "country": "Country",
+      "state": "State",
+      "password": "Password"
+    },
+    "errors": {
+      "name": "Name is required.",
+      "email": "Valid email is required.",
+      "phone": "Valid phone number is required.",
+      "age": "Valid age is required (7-100).",
+      "country": "Country is required.",
+      "state": "State is required.",
+      "password": "Password must be at least 6 characters long."
+    },
+    "registerButton": "Register",
+    "loginLink": "Already have an account? Login here."
+  },
+  "whatsappGroup": {
+    "title": "Join Our WhatsApp Group",
+    "subtitle": "Stay updated and connected with your peers. Joining the WhatsApp group is required to proceed with the exam.",
+    "joinButton": "Join WhatsApp Group",
+    "continueButton": "Continue"
+  },
+  "adminDashboard": {
+    "title": "Admin Dashboard",
+    "createExam": "Create Exam",
+    "endDate":"EndDate (YYYY-MM-DD)",
+    "startDate":"StartDate (YYYY-MM-DD)",
+    "selectAgeGroup": "Select Age Group",
+    "selectLevel": "Select Level",
+    "startTime": "Start Time (HH:MM)",
+    "endTime": "End Time (HH:MM)",
+    "invalidExpression": "Invalid Expression",
+    "invalidQuestionAlert": "Please complete the question with at least two numbers and valid operations.",
+    "duration": "Duration (minutes)",
+    "examScheduled": "Exam scheduled successfully!",
+    "incompleteExamAlert": "Please fill out all fields and add at least one question.",
+    "scheduleExam": "Schedule Exam",
+    "addQuestion": "Add Question",
+    "number": "Number",
+    "selectOperation": "Select Operation",
+    "correctAnswer": "Correct Answer",
+    "addNumber": "Add Number",
+    "existingExams": "Existing Exams",
+    "ageGroup": "Age Group",
+    "level": "Level",
+    "actions": "Actions",
+    "statistics": "Statistics",
+    "totalExams": "Total Exams Scheduled",
+    "totalQuestions": "Total Questions Created",
+    "totalStudents": "Total Students Registered",
+    "editExam": "Edit Exam",
+    "viewExam": "View Exam",
+    "questions": "Questions",
+    "question": "Question",
+    "add": "Addition (+)",
+    "subtract": "Subtraction (-)",
+    "multiply": "Multiplication (*)",
+    "divide": "Division (/)",
+    "deleteQuestion": "Delete Question",
+    "saveChanges": "Save Changes"
+  },
+  "ageGroup": {
+    "7": "7 years",
+    "7_10": "7-10 years",
+    "10Plus": "10+ years"
+  },
+  "level": {
+    "A": "Level A",
+    "B": "Level B",
+    "C": "Level C"
+  },
+  "operations": {
+    "addition": "Addition (+)",
+    "subtraction": "Subtraction (-)",
+    "multiplication": "Multiplication (*)",
+    "division": "Division (/)"
+  }
+}
