@@ -43,7 +43,7 @@ const AdminViewStudents = () => {
           alert('Authentication token is missing. Please log in again.');
           return;
         }
-        const response = await axios.get("http://localhost:5000/api/user/students", {
+        const response = await axios.get("https://exam-server-psi.vercel.app/api/user/students", {
           headers: {
             Authorization: `Bearer ${token}`, // Add Bearer token in headers
             'Content-Type': 'application/json', // Set content type
@@ -73,7 +73,7 @@ const AdminViewStudents = () => {
       }
   
       const response = await axios.post(
-        `http://localhost:5000/api/user/suspend/${id}`,
+        `https://exam-server-psi.vercel.app/api/user/suspend/${id}`,
         {},
         {
           headers: {
@@ -99,7 +99,7 @@ const AdminViewStudents = () => {
       }
   
       const response = await axios.post(
-        `http://localhost:5000/api/user/unsuspend/${id}`,
+        `https://exam-server-psi.vercel.app/api/user/unsuspend/${id}`,
         {},
         {
           headers: {

@@ -16,7 +16,7 @@ const HomePage = () => {
   const [images, setImages] = useState({ adminBg: '', userBg: '' });
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/user/getimages')
+    axios.get('https://exam-server-psi.vercel.app/api/user/getimages')
       .then(response => {
         setImages(response.data);
       })

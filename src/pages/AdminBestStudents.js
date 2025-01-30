@@ -13,7 +13,7 @@ const AdminBestStudents = () => {
         const token = localStorage.getItem("token");
         localStorage.setItem("auth_token", token);
 
-        const response = await axios.get("http://localhost:5000/api/exam/getbest", {
+        const response = await axios.get("https://exam-server-psi.vercel.app/api/exam/getbest", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

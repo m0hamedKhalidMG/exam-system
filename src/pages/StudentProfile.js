@@ -31,7 +31,7 @@ const StudentProfile = () => {
         const token = localStorage.getItem('token');
         
         // Fetch user profile
-        const response = await axios.get('http://localhost:5000/api/user/profile', {
+        const response = await axios.get('https://exam-server-psi.vercel.app/api/user/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -67,7 +67,7 @@ const StudentProfile = () => {
 
         try {
           const response = await axios.put(
-            `http://localhost:5000/api/user/update-profile-image/${profile._id}`, 
+            `https://exam-server-psi.vercel.app/api/user/update-profile-image/${profile._id}`, 
             formData, 
             {
               headers: {
@@ -99,7 +99,7 @@ const StudentProfile = () => {
       const token = localStorage.getItem('token');
 
       await axios.put(
-        `http://localhost:5000/api/user/user_update/${profile._id}`,
+        `https://exam-server-psi.vercel.app/api/user/user_update/${profile._id}`,
         {
           ...updatedProfile,
           profilePic,

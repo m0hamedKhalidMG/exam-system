@@ -53,7 +53,7 @@ const AdminDashboard = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:5000/api/exam', {
+        const response = await axios.get('https://exam-server-psi.vercel.app/api/exam', {
           headers: {
             Authorization: `Bearer ${token}`, // Add token to Authorization header
           },
@@ -216,7 +216,7 @@ const AdminDashboard = () => {
   
       // Make the DELETE request to the backend
       await axios.delete(
-        `http://localhost:5000/api/exam/delete/${id}`, // Backend API endpoint
+        `https://exam-server-psi.vercel.app/api/exam/delete/${id}`, // Backend API endpoint
         {
           headers: {
             Authorization: `Bearer ${token}`, // Add Bearer token to the headers
@@ -268,7 +268,7 @@ const AdminDashboard = () => {
   
       // Make the API call to update the exam
       const response = await axios.put(
-        `http://localhost:5000/api/exam/update/${selectedExam._id}`, // Backend API URL
+        `https://exam-server-psi.vercel.app/api/exam/update/${selectedExam._id}`, // Backend API URL
         selectedExam, // Pass the updated exam data
         {
           headers: {
@@ -450,7 +450,7 @@ const AdminDashboard = () => {
 
         // Call the backend API
         const response = await axios.post(
-          'http://localhost:5000/api/exam/create',
+          'https://exam-server-psi.vercel.app/api/exam/create',
           examData,
           {
             headers: {
@@ -863,7 +863,7 @@ const AdminDashboard = () => {
 
       // Send a DELETE request to the backend
       const response = await axios.delete(
-        `http://localhost:5000/api/exam/${selectedExam._id}/question/${idx}`, // Backend API URL
+        `https://exam-server-psi.vercel.app/api/exam/${selectedExam._id}/question/${idx}`, // Backend API URL
         {
           headers: {
             Authorization: `Bearer ${token}`, // Add Bearer token

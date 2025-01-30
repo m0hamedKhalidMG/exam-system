@@ -33,7 +33,7 @@ const StudentLogin = () => {
   const handleLogin = async () => {
     try {
       // Send login request to the backend
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post('https://exam-server-psi.vercel.app/api/auth/login', {
         email: formData.email,
         password: formData.password,
       });

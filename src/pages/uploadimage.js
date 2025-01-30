@@ -24,7 +24,7 @@ const ImageUpload = () => {
     formData.append('type', type);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/user/dashboard/images', formData, {
+      const response = await axios.post('https://exam-server-psi.vercel.app/api/user/dashboard/images', formData, {
         headers: {  Authorization: `Bearer ${token}`,'Content-Type': 'multipart/form-data' },
       });
       setMessage(response.data.message);

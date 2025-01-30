@@ -83,7 +83,7 @@ const StudentRegistration = () => {
         };
 
         // Make the API call to register the user
-        const response = await axios.post('http://localhost:5000/api/auth/register', userData);
+        const response = await axios.post('https://exam-server-psi.vercel.app/api/auth/register', userData);
        
         // Handle the response and update Redux store
         if (response.status === 201) {

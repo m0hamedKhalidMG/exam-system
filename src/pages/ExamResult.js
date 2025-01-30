@@ -33,7 +33,7 @@ const ExamResult = () => {
         const token = localStorage.getItem('token');
         
         // Fetch user profile
-        const response = await axios.get('http://localhost:5000/api/user/profile', {
+        const response = await axios.get('https://exam-server-psi.vercel.app/api/user/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

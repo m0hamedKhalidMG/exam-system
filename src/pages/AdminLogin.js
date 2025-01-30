@@ -30,7 +30,7 @@ const AdminLogin = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', credentials);
+      const response = await axios.post('https://exam-server-psi.vercel.app/api/auth/login', credentials);
       
       if (response.status === 200) {
         // Save admin information in Redux

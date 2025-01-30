@@ -112,7 +112,7 @@ useEffect(() => {
     try {
       // Send the exam data to the backend
       const response = await axios.post(
-        "http://localhost:5000/api/exam/submit",
+        "https://exam-server-psi.vercel.app/api/exam/submit",
         {
           userId: userInfo.id, 
           examId: currentExam._id, 
