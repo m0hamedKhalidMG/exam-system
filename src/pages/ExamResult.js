@@ -1,4 +1,4 @@
-import React ,{useEffect}from 'react';
+import React ,{useEffect,useState}from 'react';
 import {
   Typography,
   Card,
@@ -14,6 +14,7 @@ import {
 import { useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 
 const ExamResult = () => {
   const { t } = useTranslation(); // Translation hook
@@ -21,9 +22,33 @@ const ExamResult = () => {
   const location = useLocation();
   const { level, answers } = location.state || {};
   const profile = JSON.parse(localStorage.getItem('userInfo'));
-
+ const [imgprofile, setProfileimg] = useState(null);
   console.log(profile.username)
   const exams = useSelector((state) => state.admin.exams);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        // Get token from local storage
+        const token = localStorage.getItem('token');
+        
+        // Fetch user profile
+        const response = await axios.get('http://localhost:5000/api/user/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const userProfile = response.data.user.profileImage;
+      console.log(userProfile)
+        setProfileimg(userProfile || '');
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
 useEffect(() => {
     console.log(exams)
     if (!exams || exams.length === 0) {
@@ -56,7 +81,7 @@ console.log(questions)
         <CardContent>
           <Box style={styles.header}>
             <Avatar
-              src={profile?.image || ''}
+              src={imgprofile}
               alt={profile?.username}
               style={styles.avatar}
             >

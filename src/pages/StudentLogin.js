@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux';
 import { setProfile } from '../redux/studentSlice';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import { loginStudent } from '../redux/studentSlice';  // Import the loginStudent action
 
 const StudentLogin = () => {
   const { t } = useTranslation();
@@ -46,6 +47,8 @@ console.log(response)
         };
         localStorage.setItem('userInfo', JSON.stringify(userInfo));
         localStorage.setItem('token', response.data.token); // Save token to localStorage
+        dispatch(loginStudent(response.data.user));
+
         navigate('/level-selection'); // Redirect to level selection page
       } else {
         setError(t('studentLogin.invalidCredentials')); // Set error message if no profile found

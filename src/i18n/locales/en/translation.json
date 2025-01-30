@@ -14,7 +14,8 @@
     "title": "Top Students",
     "averageScore": "Average Score",
     "age": "Age",
-    "email": "Email"
+    "email": "Email",
+    "image":"Image"
   },
   "whatsAppGroup": {
     "title": "Join WhatsApp Group",
@@ -27,7 +28,9 @@
     "manageDashboard": "Manage Dashboard",
     "goToDashboard": "Go to Dashboard",
     "viewBestStudents": "View Best Students",
-    "viewStudentsAndCharts": "View Students & Charts"
+    "viewStudentsAndCharts": "View Students & Charts",
+    "uploadImage":"UploadImage For background "
+
   },
   "adminLogin": {
     "title": "Admin Login",
@@ -45,7 +48,9 @@
       "phone": "Phone",
       "age": "Age",
       "blocked": "Blocked",
-      "actions": "Actions"
+      "actions": "Actions",
+      "image":"Image"
+
     },
     "status": {
       "yes": "Yes",

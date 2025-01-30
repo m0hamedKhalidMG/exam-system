@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
   Card,
@@ -9,7 +9,12 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Dialog,
+  DialogContent,
   IconButton,
+  Grid,
+  useMediaQuery,
+  Hidden,
 } from '@mui/material';
 import { Block, GetApp, Done } from '@mui/icons-material';
 import { useSelector, useDispatch } from 'react-redux';
@@ -17,13 +22,16 @@ import jsPDF from 'jspdf';
 import { Chart } from 'react-google-charts';
 import { useTranslation } from 'react-i18next';
 import axios from "axios";
-
-
+import { useTheme } from '@mui/material/styles';
 
 const AdminViewStudents = () => {
   const { t } = useTranslation(); // Translation hook
   const students = useSelector((state) => state.admin.students);
   const dispatch = useDispatch();
+  const [open, setOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState("");
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Fetch students from backend
   useEffect(() => {
@@ -31,14 +39,16 @@ const AdminViewStudents = () => {
       try {
         const token = localStorage.getItem('token'); // Retrieve token from localStorage
   
-      if (!token) {
-        alert('Authentication token is missing. Please log in again.');
-        return;
-      }
-        const response = await axios.get("http://localhost:5000/api/user/students",{headers: {
-          Authorization: `Bearer ${token}`, // Add Bearer token in headers
-          'Content-Type': 'application/json', // Set content type
-        },});
+        if (!token) {
+          alert('Authentication token is missing. Please log in again.');
+          return;
+        }
+        const response = await axios.get("http://localhost:5000/api/user/students", {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add Bearer token in headers
+            'Content-Type': 'application/json', // Set content type
+          },
+        });
         console.log(response.data)
         dispatch({ type: "admin/setStudents", payload: response.data });
       } catch (error) {
@@ -49,16 +59,11 @@ const AdminViewStudents = () => {
     fetchStudents();
   }, [dispatch]);
 
-  // const handleBlockStudent = (id) => {
-  //   console.log(id)
-  //   dispatch({ type: "admin/blockStudent", payload: id });
-  //   alert(t("adminViewStudents.alerts.blocked"));
-  // };
+  const handleImageClick = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setOpen(true);
+  };
 
-  // const handleUnblockStudent = (id) => {
-  //   dispatch({ type: "admin/unblockStudent", payload: id });
-  //   alert(t("adminViewStudents.alerts.unblocked"));
-  // };
   const handleBlockStudent = async (id) => {
     try {
       const token = localStorage.getItem('token');
@@ -162,7 +167,7 @@ const AdminViewStudents = () => {
 
     doc.save("students_report.pdf");
   };
-
+  
   const performanceChartData = [
     [
       t("adminViewStudents.chart.labels.student"),
@@ -209,97 +214,140 @@ const AdminViewStudents = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <Card style={{ marginBottom: "20px" }}>
-        <CardContent>
-          <Typography variant="h4">
-            {t("adminViewStudents.title")}
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={downloadPDF}
-          >
-            <GetApp style={{ marginRight: "10px" }} />
-            {t("adminViewStudents.downloadButton")}
-          </Button>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{t("adminViewStudents.table.name")}</TableCell>
-                <TableCell>{t("adminViewStudents.table.email")}</TableCell>
-                <TableCell>{t("adminViewStudents.table.phone")}</TableCell>
-                <TableCell>{t("adminViewStudents.table.age")}</TableCell>
-                <TableCell>{t("adminViewStudents.table.blocked")}</TableCell>
-                <TableCell>{t("adminViewStudents.table.actions")}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {students.map((student) => (
-                <TableRow key={student.id}>
-                  <TableCell>{student.name}</TableCell>
-                  <TableCell>{student.email}</TableCell>
-                  <TableCell>{student.whatsappNumber}</TableCell>
-                  <TableCell>{student.age}</TableCell>
-                  <TableCell>
-                    {student.suspended
-                      ? t("adminViewStudents.status.yes")
-                      : t("adminViewStudents.status.no")}
-                  </TableCell>
-                  <TableCell>
-                    {student.suspended ? (
-                      <IconButton
-                        color="success"
-                        onClick={() => handleUnblockStudent(student._id)}
-                      >
-                        <Done />
-                      </IconButton>
-                    ) : (
-                      <IconButton
-                        color="secondary"
-                        onClick={() => handleBlockStudent(student._id)}
-                      >
-                        <Block />
-                      </IconButton>
-                    )}
-                  </TableCell>
+    <Grid container spacing={2} style={{ padding: "20px" }}>
+      <Grid item xs={12}>
+        <Card>
+          <CardContent>
+            <Typography variant="h4">
+              {t("adminViewStudents.title")}
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={downloadPDF}
+            >
+              <GetApp style={{ marginRight: "10px" }} />
+              {t("adminViewStudents.downloadButton")}
+            </Button>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <Hidden smDown>
+                    <TableCell>{t("adminViewStudents.table.image")}</TableCell>
+                  </Hidden>
+                  <TableCell>{t("adminViewStudents.table.name")}</TableCell>
+                  <Hidden smDown>
+                    <TableCell>{t("adminViewStudents.table.email")}</TableCell>
+                  </Hidden>
+                  <TableCell>{t("adminViewStudents.table.phone")}</TableCell>
+                  <Hidden smDown>
+                    <TableCell>{t("adminViewStudents.table.age")}</TableCell>
+                  </Hidden>
+                  <TableCell>{t("adminViewStudents.table.blocked")}</TableCell>
+                  <TableCell>{t("adminViewStudents.table.actions")}</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHead>
+              <TableBody>
+                {students.map((student) => (
+                  <TableRow key={student.id}>
+                    <Hidden smDown>
+                      <TableCell>
+                        <img
+                          src={student.profileImage}
+                          alt={student.name}
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            borderRadius: "50%",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleImageClick(student.profileImage)}
+                        />
+                      </TableCell>
+                    </Hidden>
+                    <TableCell>{student.name}</TableCell>
+                    <Hidden smDown>
+                      <TableCell>{student.email}</TableCell>
+                    </Hidden>
+                    <TableCell>{student.whatsappNumber}</TableCell>
+                    <Hidden smDown>
+                      <TableCell>{student.age}</TableCell>
+                    </Hidden>
+                    <TableCell>
+                      {student.suspended
+                        ? t("adminViewStudents.status.yes")
+                        : t("adminViewStudents.status.no")}
+                    </TableCell>
+                    <TableCell>
+                      {student.suspended ? (
+                        <IconButton
+                          color="success"
+                          onClick={() => handleUnblockStudent(student._id)}
+                        >
+                          <Done />
+                        </IconButton>
+                      ) : (
+                        <IconButton
+                          color="secondary"
+                          onClick={() => handleBlockStudent(student._id)}
+                        >
+                          <Block />
+                        </IconButton>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </Grid>
 
-      <Card style={{ marginBottom: "20px" }}>
-        <CardContent>
-          <Typography variant="h5">
-            {t("adminViewStudents.chart.performanceTitle")}
-          </Typography>
-          <Chart
-            chartType="ComboChart"
-            data={performanceChartData}
-            options={chartOptions}
-            width="100%"
-            height="400px"
+      {/* Image Modal */}
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogContent>
+          <img
+            src={selectedImage}
+            alt="Student"
+            style={{ width: "100%", height: "auto", borderRadius: "8px" }}
           />
-        </CardContent>
-      </Card>
+        </DialogContent>
+      </Dialog>
+{/* 
+      <Grid item xs={12} md={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h5">
+              {t("adminViewStudents.chart.performanceTitle")}
+            </Typography>
+            <Chart
+              chartType="ComboChart"
+              data={performanceChartData}
+              options={chartOptions}
+              width="100%"
+              height="400px"
+            />
+          </CardContent>
+        </Card>
+      </Grid> */}
 
-      <Card>
-        <CardContent>
-          <Typography variant="h5">
-            {t("adminViewStudents.chart.blockedTitle")}
-          </Typography>
-          <Chart
-            chartType="PieChart"
-            data={blockedData}
-            options={pieChartOptions}
-            width="100%"
-            height="400px"
-          />
-        </CardContent>
-      </Card>
-    </div>
+      <Grid item xs={12} md={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h5">
+              {t("adminViewStudents.chart.blockedTitle")}
+            </Typography>
+            <Chart
+              chartType="PieChart"
+              data={blockedData}
+              options={pieChartOptions}
+              width="100%"
+              height="400px"
+            />
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
   );
 };
 

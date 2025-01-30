@@ -15,7 +15,9 @@
     "title": "أفضل الطلاب",
     "averageScore": "متوسط الدرجات",
     "age": "العمر",
-    "email": "البريد الإلكتروني"
+    "email": "البريد الإلكتروني",
+    "image":"صوره"
+
   },
   "whatsAppGroup": {
     "title": "انضم إلى مجموعة واتساب",
@@ -28,6 +30,7 @@
     "manageDashboard": "إدارة لوحة التحكم",
     "goToDashboard": "اذهب إلى لوحة التحكم",
     "viewBestStudents": "عرض أفضل الطلاب",
+    "uploadImage":" رفع صوره للخلفيه",
     "viewStudentsAndCharts": "عرض الطلاب والرسوم البيانية"
   },
   "adminLogin": {
@@ -46,7 +49,9 @@
       "phone": "الهاتف",
       "age": "العمر",
       "blocked": "محظور",
-      "actions": "الإجراءات"
+      "actions": "الإجراءات",
+      "image":"صوره"
+
     },
     "status": {
       "yes": "نعم",

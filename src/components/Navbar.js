@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -13,21 +13,20 @@ import {
   Select,
 } from '@mui/material';
 import { InputLabel, FormControl } from "@mui/material";
-
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logoutAdmin } from '../redux/adminSlice';
 import { logoutStudent } from '../redux/studentSlice';
 import { useTranslation } from 'react-i18next';
-import logo from '../assets/logooo.png';
+import logo from '../assets/logooo.png'; // Ensure the logo path is correct
+import { useSelector } from 'react-redux';
 
 const Navbar = () => {
   const { t, i18n } = useTranslation(); // Translation hook
-
+  const profile = useSelector((state) => state.student.profile);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const isMobile = useMediaQuery('(max-width:600px)');
   const [menuAnchor, setMenuAnchor] = React.useState(null);
 
@@ -81,9 +80,15 @@ const Navbar = () => {
 
       <AppBar position="fixed" style={styles.navbar}>
         <Toolbar style={styles.toolbar}>
+          {/* Logo Container */}
           <Box style={styles.logoContainer}>
-            <img src={logo} alt={t('navbar.title')} style={styles.logo} />
+            <img
+              src={logo}
+              alt={t('navbar.title')}
+              style={styles.logo}
+            />
           </Box>
+
           {isMobile ? (
             <>
               <IconButton
@@ -115,14 +120,6 @@ const Navbar = () => {
                 {studentProfile && (
                   <>
                     <MenuItem onClick={handleHomeClick}>{t('navbar.home')}</MenuItem>
-                    {/* <MenuItem
-                      onClick={() => {
-                        handleMenuClose();
-                        handleHistoryClick();
-                      }}
-                    >
-                      {t('navbar.history')}
-                    </MenuItem> */}
                     <MenuItem onClick={handleMenuClose}>
                       {studentProfile.username}
                     </MenuItem>
@@ -173,16 +170,11 @@ const Navbar = () => {
                   <Button style={styles.historyButton} onClick={handleHomeClick}>
                     {t('navbar.home')}
                   </Button>
-                  {/* <Button
-                    style={styles.historyButton}
-                    onClick={handleHistoryClick}
-                  >
-                    {t('navbar.history')}
-                  </Button> */}
                   <Typography style={styles.name}>
                     {studentProfile.username}
                   </Typography>
                   <Avatar
+                    src={profile?.profileImage}
                     style={styles.avatar}
                     onClick={handleAvatarClick}
                   >
@@ -219,29 +211,55 @@ const styles = {
   },
   select: {
     padding: "5px",
-    backgroundColor: "#f5f5f5", // Light background
+    backgroundColor: "#000", // Light background
     borderRadius: "8px",
     fontSize: "14px",
     color: "#333",
   },
-  navbar: { backgroundColor: '#1565c0' },
+  navbar: {
+    background: '#FFFFFF', // Set navbar background to white
+    color: '#000000', // Ensure text is visible on a white background
+    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', // Optional shadow for better visibility
+  },
   toolbar: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    padding: '0 16px', // Add padding to the toolbar
   },
-  historyButton: {
-    color: '#fff',
+  logoContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    flex: 1, // Allows it to take space
+  },
+  logo: {
+    height: '80px', // Increase height
+    width: 'auto', // Maintain aspect ratio
+    maxWidth: '180px', // Ensure it doesn't get too big
+    objectFit: 'contain', // Ensures proper fitting
+  },
+  rightSection: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '15px',
+  },
+  name: {
+    fontSize: '16px',
+    color: '#000',
+  },
+  avatar: {
+    cursor: 'pointer',
+    backgroundColor: '#000',
+    color: '#1565c0',
+  },
+  logoutButton: {
+    color: '#000',
     fontWeight: 'bold',
-    textTransform: 'none',
   },
-  logoContainer: { flex: 0, display: 'flex', alignItems: 'center' },
-  logo: { height: '50px', objectFit: 'contain', marginRight: '15px' },
-  rightSection: { display: 'flex', alignItems: 'center', gap: '15px' },
-  name: { fontSize: '16px', color: '#fff' },
-  avatar: { cursor: 'pointer', backgroundColor: '#ffffff', color: '#1565c0' },
-  logoutButton: { color: '#fff', fontWeight: 'bold' },
-  languageSelector: { marginLeft: 'auto', color: '#fff' },
+  languageSelector: {
+    marginLeft: 'auto',
+    color: '#000',
+  },
 };
 
 export default Navbar;

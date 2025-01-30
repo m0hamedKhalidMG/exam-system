@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import StarIcon from '@mui/icons-material/Star';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 const AdminHub = () => {
   const { t } = useTranslation(); // Translation hook
@@ -83,6 +84,26 @@ const AdminHub = () => {
             </CardContent>
           </Card>
         </Grid>
+        <Grid item xs={12} md={4}>
+          <Card style={styles.card}>
+            <CardContent>
+              <div style={styles.iconWrapper}>
+                <CloudUploadIcon style={styles.icon} />
+              </div>
+              <Typography variant="h6" align="center" style={styles.cardTitle}>
+                {t('adminHub.uploadImage')}
+              </Typography>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => handleNavigate('/upload-image')}
+                style={styles.button}
+              >
+                {t('adminHub.uploadImage')}
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
     </div>
   );
@@ -122,7 +143,7 @@ const styles = {
     padding: '20px',
     textAlign: 'center',
     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-    height: '300px', // Set fixed height for the card
+    height: '300px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',

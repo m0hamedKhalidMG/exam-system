@@ -22,6 +22,7 @@ import StudentLogin from './pages/StudentLogin'; // Add Login Page
 import AdminViewStudents from './pages/AdminViewStudents';
 import AdminBestStudents from './pages/AdminBestStudents';
 import AdminHub from './pages/AdminHub';
+import ImageUpload from './pages/uploadimage';
 
 const store = configureStore({
   reducer: {
@@ -38,6 +39,8 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="upload-image" element={<ImageUpload />} />
+
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin-hub" element={<AdminHub />} />
           <Route path="/best-students" element={<AdminBestStudents />} />

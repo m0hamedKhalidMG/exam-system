@@ -14,7 +14,6 @@ import { updateProfile } from '../redux/studentSlice';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-
 const StudentProfile = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -40,7 +39,7 @@ const StudentProfile = () => {
         const userProfile = response.data.user;
         setProfile(userProfile);
         setUpdatedProfile(userProfile);
-     //   setProfilePic(userProfile.profilePic || '');
+     setProfilePic(userProfile.profileImage || '');
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
@@ -54,17 +53,46 @@ const StudentProfile = () => {
     setUpdatedProfile({ ...updatedProfile, [name]: value });
   };
 
-  const handleProfilePicChange = (e) => {
+  const handleProfilePicChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = async () => {
         setProfilePic(reader.result); // Display the uploaded image
+        const token = localStorage.getItem('token'); // Get token from localStorage
+
+        // Prepare the image for uploading
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+          const response = await axios.put(
+            `http://localhost:5000/api/user/update-profile-image/${profile._id}`, 
+            formData, 
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`, // Send Bearer token for authentication
+                'Content-Type': 'multipart/form-data', // Tell the server that we're sending a file
+              }
+            }
+          );
+          setProfilePic(response.data.imageUrl);
+          dispatch(
+            updateProfile({
+              id: profile.id,
+              updatedData: { ...updatedProfile, profilePic },
+            })
+          );
+          setProfile(updatedProfile);
+          
+          console.log('Image uploaded successfully:', response.data);
+        } catch (error) {
+          console.error('Error uploading image:', error);
+        }
       };
       reader.readAsDataURL(file);
     }
   };
-
   const handleSave = async () => {
     
     try {
@@ -82,7 +110,7 @@ const StudentProfile = () => {
           },
         }
       );
-      
+      console.log(profilePic)
       dispatch(
         updateProfile({
           id: profile.id,

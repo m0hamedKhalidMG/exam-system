@@ -1,23 +1,53 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 import { Typography, Button, Grid, Card, CardContent, CardMedia } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import  axios from 'axios'
 
 const HomePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const studentProfile = useSelector((state) => state.student.profile);
-  const adminLoggedIn = useSelector((state) => state.admin.isLoggedIn);
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
+  // Determine admin and student status
+  const adminLoggedIn = userInfo?.role === 'admin';
+  const studentProfile = userInfo?.role === 'user' ? userInfo : null;
+  const [images, setImages] = useState({ adminBg: '', userBg: '' });
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/user/getimages')
+      .then(response => {
+        setImages(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching images:', error);
+      });
+  }, []);
   return (
     <div style={styles.container}>
       <div style={styles.heroSection}>
         <Typography variant="h2" align="center" style={styles.title}>
-          {t('homePage.welcomeTitle')}
+          {/* {t('homePage.welcomeTitle')} */}
+          أطلق العِنان لإمكانات إبنك 
+
         </Typography>
-        <Typography variant="h5" align="center" style={styles.subtitle}>
-          {t('homePage.welcomeSubtitle')}
+        <Typography variant="h6" align="center" style={styles.subtitle}>
+          {/* {t('homePage.welcomeSubtitle')} */}
+        من خلال برامج التعلم المباشر المتطورة لدينا، إلى جانب أفضل المعلمين
+
+        </Typography>
+
+        <Typography variant="h6" align="center" style={styles.subtitle}>
+          {/* {t('homePage.welcomeSubtitle')} */}
+          مؤسس التعليم المبرمج الحساب الذهني في اليمن
+          المدرب / أواب الخضر 
+
+        </Typography>
+        <Typography variant="h6" align="center" style={styles.subtitle}>
+          {/* {t('homePage.welcomeSubtitle')} */}
+          المدرب / أواب الخضر 
+
         </Typography>
       </div>
       <Grid container spacing={4} justifyContent="center" style={styles.grid}>
@@ -62,7 +92,7 @@ const HomePage = () => {
               <CardMedia
                 component="img"
                 height="200"
-                image="https://firebasestorage.googleapis.com/v0/b/sec-project-368ee.appspot.com/o/12bd1558-9da8-4f24-9b1a-eacec172fba2.jpg?alt=media&token=4ed8e252-4096-4365-b552-c3d582d18f98" // Replace with your student image URL
+                image={images.userBg}
                 alt="Student"
               />
               <CardContent>
@@ -93,152 +123,75 @@ const HomePage = () => {
           </Grid>
         ) : (
           <>
-         <Grid item xs={12} md={5}>
-  <Card
-    style={{
-      borderRadius: '20px',
-      boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)',
-      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-    }}
-    onMouseOver={(e) => {
-      e.currentTarget.style.transform = 'scale(1.05)';
-      e.currentTarget.style.boxShadow = '0px 12px 20px rgba(0, 0, 0, 0.2)';
-    }}
-    onMouseOut={(e) => {
-      e.currentTarget.style.transform = 'scale(1)';
-      e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.1)';
-    }}
-  >
-    <CardMedia
-      component="img"
-      height="200"
-      image="https://firebasestorage.googleapis.com/v0/b/sec-project-368ee.appspot.com/o/pexels-cottonbro-3201580.jpg?alt=media&token=a457eeac-82b6-415a-918d-24bd822e482e"
-      alt="Admin Access"
-      style={{
-        borderTopLeftRadius: '20px',
-        borderTopRightRadius: '20px',
-        objectFit: 'cover',
-      }}
-    />
-    <CardContent style={{ padding: '20px', textAlign: 'center' }}>
-      <Typography
-        variant="h5"
-        style={{
-          fontWeight: '600',
-          marginBottom: '10px',
-          color: '#333',
-        }}
-      >
-        {t('homePage.adminAccessTitle')}
-      </Typography>
-      <Typography
-        variant="body1"
-        style={{
-          color: '#555',
-          marginBottom: '20px',
-        }}
-      >
-        {t('homePage.adminAccessDescription')}
-      </Typography>
-      <Button
-        variant="contained"
-        fullWidth
-        onClick={() => navigate('/admin-login')}
-        style={{
-          backgroundColor: '#3f51b5',
-          color: '#fff',
-          padding: '10px 20px',
-          borderRadius: '10px',
-          fontWeight: 'bold',
-          textTransform: 'none',
-          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
-        }}
-        onMouseOver={(e) =>
-          (e.currentTarget.style.backgroundColor = '#2e3c9a')
-        }
-        onMouseOut={(e) =>
-          (e.currentTarget.style.backgroundColor = '#3f51b5')
-        }
-      >
-        {t('homePage.adminAccessButton')}
-      </Button>
-    </CardContent>
-  </Card>
-</Grid>
+            <Grid item xs={12} md={5}>
+              <Card style={styles.card}>
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={images.adminBg}
+                  alt="Admin Access"
+                />
+                <CardContent>
+                  <Typography
+                    variant="h5"
+                    align="center"
+                    style={styles.cardTitle}
+                  >
+                    {t('homePage.adminAccessTitle')}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    align="center"
+                    style={styles.cardText}
+                  >
+                    {t('homePage.adminAccessDescription')}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={() => navigate('/admin-login')}
+                    style={styles.button}
+                  >
+                    {t('homePage.adminAccessButton')}
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={5}>
+              <Card style={styles.card}>
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={images.userBg}
 
-<Grid item xs={12} md={5}>
-  <Card
-    style={{
-      borderRadius: '20px',
-      boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)',
-      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-    }}
-    onMouseOver={(e) => {
-      e.currentTarget.style.transform = 'scale(1.05)';
-      e.currentTarget.style.boxShadow = '0px 12px 20px rgba(0, 0, 0, 0.2)';
-    }}
-    onMouseOut={(e) => {
-      e.currentTarget.style.transform = 'scale(1)';
-      e.currentTarget.style.boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.1)';
-    }}
-  >
-    <CardMedia
-      component="img"
-      height="200"
-      image="https://firebasestorage.googleapis.com/v0/b/sec-project-368ee.appspot.com/o/pexels-julia-m-cameron-4143800.jpg?alt=media&token=2da6545b-b470-4992-971c-e3a8cb3cb983"
-      alt="Student Hub"
-      style={{
-        borderTopLeftRadius: '20px',
-        borderTopRightRadius: '20px',
-        objectFit: 'cover',
-      }}
-    />
-    <CardContent style={{ padding: '20px', textAlign: 'center' }}>
-      <Typography
-        variant="h5"
-        style={{
-          fontWeight: '600',
-          marginBottom: '10px',
-          color: '#333',
-        }}
-      >
-        {t('homePage.studentHubTitle')}
-      </Typography>
-      <Typography
-        variant="body1"
-        style={{
-          color: '#555',
-          marginBottom: '20px',
-        }}
-      >
-        {t('homePage.studentHubDescription')}
-      </Typography>
-      <Button
-        variant="contained"
-        fullWidth
-        onClick={() => navigate('/register')}
-        style={{
-          backgroundColor: '#ff7043',
-          color: '#fff',
-          padding: '10px 20px',
-          borderRadius: '10px',
-          fontWeight: 'bold',
-          textTransform: 'none',
-          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
-        }}
-        onMouseOver={(e) =>
-          (e.currentTarget.style.backgroundColor = '#e65c28')
-        }
-        onMouseOut={(e) =>
-          (e.currentTarget.style.backgroundColor = '#ff7043')
-        }
-      >
-        {t('homePage.studentHubButton')}
-      </Button>
-    </CardContent>
-  </Card>
-</Grid>
-
+                  alt="Student Hub"
+                />
+                <CardContent>
+                  <Typography
+                    variant="h5"
+                    align="center"
+                    style={styles.cardTitle}
+                  >
+                    {t('homePage.studentHubTitle')}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    align="center"
+                    style={styles.cardText}
+                  >
+                    {t('homePage.studentHubDescription')}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={() => navigate('/register')}
+                    style={styles.button}
+                  >
+                    {t('homePage.studentHubButton')}
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
           </>
         )}
       </Grid>
