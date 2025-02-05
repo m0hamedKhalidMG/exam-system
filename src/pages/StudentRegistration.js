@@ -134,7 +134,7 @@ const StudentRegistration = () => {
               )}
             </div>
 
-            {['name', 'email', 'phone', 'age', 'country', 'state','file'].map((field) => (
+            {['name', 'email', 'phone', 'age', 'country', 'state'].map((field) => (
               <TextField
                 key={field}
                 label={t(`studentRegistration.fields.${field}`)}
