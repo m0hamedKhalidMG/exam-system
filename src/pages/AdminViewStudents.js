@@ -49,7 +49,7 @@ const AdminViewStudents = () => {
             'Content-Type': 'application/json', // Set content type
           },
         });
-        console.log(response.data)
+        //console.log(response.data)
         dispatch({ type: "admin/setStudents", payload: response.data });
       } catch (error) {
         console.error("Error fetching students:", error);

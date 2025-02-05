@@ -29,7 +29,7 @@ const LevelSelection = () => {
             },
           }
         );
-        console.log(response.data)
+        //console.log(response.data)
         setExams(response.data || []); // Adjust based on API response structure
   dispatch(loadExam(response.data));
 
@@ -53,7 +53,7 @@ const LevelSelection = () => {
       return;
     }
     dispatch(loadExam(filteredExamsAge));
-    console.log(filteredExamsAge)
+    //console.log(filteredExamsAge)
   };
 
   const handleLevelSelection = (level) => {
@@ -66,7 +66,7 @@ const LevelSelection = () => {
       return;
     }
     dispatch(loadExam(filteredExams));
-    console.log(filteredExams)
+    //console.log(filteredExams)
     navigate('/instructions', { state: { level, ageGroup: selectedAgeGroup } });
   };
 
@@ -87,7 +87,7 @@ const LevelSelection = () => {
                 {t('levelSelection.step1')}
               </Typography>
               <Grid container spacing={3} justifyContent="center">
-                {['7', '7-10', '10+'].map((ageGroup) => (
+                {['7', '8-10', '10+'].map((ageGroup) => (
                   <Grid item xs={12} sm={4} key={ageGroup}>
                     <Button
                       variant="contained"

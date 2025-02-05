@@ -24,7 +24,7 @@ const ExamPage = () => {
   const profile = localStorage.getItem('token');
   const befarelevelExams = exams.filter((exam) => exam.class === level);
   const levelExams = befarelevelExams.filter((exam) => exam.ageGroup === Age);
- console.log(levelExams[0])
+ //console.log(levelExams[0])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [timeRemaining, setTimeRemaining] = useState(null); // For countdown timer
@@ -32,7 +32,7 @@ const ExamPage = () => {
   const questions = currentExam?.questions || [];
   const dispatch = useDispatch();
 useEffect(() => {
-    console.log(exams)
+    //console.log(exams)
     if (!exams || exams.length === 0) {
       navigate('/');
     }
@@ -116,8 +116,10 @@ useEffect(() => {
         {
           userId: userInfo.id, 
           examId: currentExam._id, 
+          timeexam:currentExam.timer*60-timeRemaining,
           answers, 
           score: score, 
+          total:questions.length
         },
         {
           headers: {

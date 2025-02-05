@@ -5,12 +5,14 @@ import {
   Button,
   Card,
   CardContent,
+  IconButton
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setProfile, addProfile } from '../redux/studentSlice';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
 
 const StudentRegistration = () => {
   const { t } = useTranslation();
@@ -28,6 +30,7 @@ const StudentRegistration = () => {
     password: '',
   });
 
+  const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -35,33 +38,28 @@ const StudentRegistration = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
   const validate = () => {
     const newErrors = {};
     if (!formData.name) newErrors.name = t('studentRegistration.errors.name');
-    if (
-      !formData.email ||
-      !/^[\w-\.]+@[\w-]+\.[\w-]{2,4}$/.test(formData.email)
-    ) {
+    if (!formData.email || !/^[\w-\.]+@[\w-]+\.[\w-]{2,4}$/.test(formData.email)) {
       newErrors.email = t('studentRegistration.errors.email');
     }
     if (!formData.phone || !/^\+?[1-9]\d{9,14}$/.test(formData.phone)) {
       newErrors.phone = t('studentRegistration.errors.phone');
     }
-    if (
-      !formData.age ||
-      isNaN(formData.age) ||
-      formData.age < 7 ||
-      formData.age > 100
-    ) {
+    if (!formData.age || isNaN(formData.age) || formData.age < 7 || formData.age > 100) {
       newErrors.age = t('studentRegistration.errors.age');
     }
-    if (!formData.country)
-      newErrors.country = t('studentRegistration.errors.country');
-    if (!formData.state)
-      newErrors.state = t('studentRegistration.errors.state');
+    if (!formData.country) newErrors.country = t('studentRegistration.errors.country');
+    if (!formData.state) newErrors.state = t('studentRegistration.errors.state');
     if (!formData.password || formData.password.length < 6) {
       newErrors.password = t('studentRegistration.errors.password');
     }
+    if (!file) newErrors.file = t('studentRegistration.errors.file'); // Image required error
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -70,22 +68,23 @@ const StudentRegistration = () => {
     e.preventDefault();
     if (validate()) {
       try {
-        const userData = {
-          username: formData.name,
-          email: formData.email,
-          password: formData.password,
-          name: formData.name,
-          age: formData.age,
-          country: formData.country,
-          province: formData.state,
-          whatsappNumber: formData.phone,
-          profileImage: 'http://example.com/default-profile.png', // Set a default or dynamic image URL
-        };
+        const formDataToSend = new FormData();
+        formDataToSend.append('username', formData.name);
+        formDataToSend.append('email', formData.email);
+        formDataToSend.append('password', formData.password);
+        formDataToSend.append('name', formData.name);
+        formDataToSend.append('age', formData.age);
+        formDataToSend.append('country', formData.country);
+        formDataToSend.append('province', formData.state);
+        formDataToSend.append('whatsappNumber', formData.phone);
+        formDataToSend.append('image', file);
 
-        // Make the API call to register the user
-        const response = await axios.post('https://exam-server-psi.vercel.app/api/auth/register', userData);
-       
-        // Handle the response and update Redux store
+        const response = await axios.post(
+          'https://exam-server-psi.vercel.app/api/auth/register',
+          formDataToSend,
+          { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
+
         if (response.status === 201) {
           localStorage.setItem('token', response.data.token);
           const userInfo = {
@@ -95,11 +94,10 @@ const StudentRegistration = () => {
           };
           localStorage.setItem('userInfo', JSON.stringify(userInfo));
 
-          dispatch(addProfile(userData)); // Add new profile to Redux store
-          dispatch(setProfile(userData)); // Set as the logged-in profile
+          dispatch(addProfile(formData));
+          dispatch(setProfile(formData));
           navigate('/whatsapp-group');
         } else {
-          // Handle error response (e.g., show a message to the user)
           console.error('Registration failed:', response.data);
         }
       } catch (error) {
@@ -115,22 +113,41 @@ const StudentRegistration = () => {
           <Typography variant="h4" align="center" style={styles.title}>
             {t('studentRegistration.title')}
           </Typography>
-          <form onSubmit={handleSubmit}>
-            {['name', 'email', 'phone', 'age', 'country', 'state'].map(
-              (field) => (
-                <TextField
-                  key={field}
-                  label={t(`studentRegistration.fields.${field}`)}
-                  name={field}
-                  fullWidth
-                  value={formData[field]}
-                  onChange={handleChange}
-                  error={!!errors[field]}
-                  helperText={errors[field]}
-                  style={styles.input}
-                />
-              )
-            )}
+          <form onSubmit={handleSubmit} encType="multipart/form-data">
+            <div style={styles.uploadButton}>
+              <input
+                accept="image/*"
+                id="upload-button"
+                type="file"
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+              <label htmlFor="upload-button">
+                <IconButton component="span" color="primary">
+                  <PhotoCamera />
+                </IconButton>
+              </label>
+              {file ? (
+                <Typography>{file.name}</Typography>
+              ) : (
+                <Typography style={styles.errorText}>{errors.file}</Typography>
+              )}
+            </div>
+
+            {['name', 'email', 'phone', 'age', 'country', 'state','file'].map((field) => (
+              <TextField
+                key={field}
+                label={t(`studentRegistration.fields.${field}`)}
+                name={field}
+                fullWidth
+                value={formData[field]}
+                onChange={handleChange}
+                error={!!errors[field]}
+                helperText={errors[field]}
+                style={styles.input}
+                {...(field === 'phone' && { placeholder: 'أكتب الرقم مع مفتاح الدولة' })}
+              />
+            ))}
             <TextField
               label={t('studentRegistration.fields.password')}
               name="password"
@@ -167,8 +184,7 @@ const StudentRegistration = () => {
 
 const styles = {
   container: {
-    background:
-      'linear-gradient(135deg, rgba(25, 118, 210, 0.9), rgba(37, 206, 209, 0.8))',
+    background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.9), rgba(37, 206, 209, 0.8))',
     minHeight: '100vh',
     display: 'flex',
     justifyContent: 'center',
@@ -200,9 +216,15 @@ const styles = {
     color: '#1565c0',
     cursor: 'pointer',
     textDecoration: 'underline',
-    ':hover': {
-      textDecoration: 'none',
-    },
+  },
+  uploadButton: {
+    textAlign: 'center',
+    marginBottom: '20px',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: '0.8rem',
+    marginTop: '5px',
   },
 };
 

@@ -21,6 +21,8 @@ import LevelSelection from './pages/LevelSelection';
 import StudentLogin from './pages/StudentLogin'; // Add Login Page
 import AdminViewStudents from './pages/AdminViewStudents';
 import AdminBestStudents from './pages/AdminBestStudents';
+import ExamHistory from './pages/ExamHistory';
+
 import AdminHub from './pages/AdminHub';
 import ImageUpload from './pages/uploadimage';
 
@@ -40,6 +42,8 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="upload-image" element={<ImageUpload />} />
+          
+          <Route path="/getdegree" element={<ExamHistory />} />
 
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin-hub" element={<AdminHub />} />

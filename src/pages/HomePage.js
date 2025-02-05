@@ -1,10 +1,10 @@
 import React,{useState,useEffect} from 'react';
-import { Typography, Button, Grid, Card, CardContent, CardMedia } from '@mui/material';
+import { Typography, Button, Grid, Card, CardContent, CardMedia,Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import  axios from 'axios'
-
+import Footer from './../components/Footer';
 const HomePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -32,23 +32,13 @@ const HomePage = () => {
           أطلق العِنان لإمكانات إبنك 
 
         </Typography>
-        <Typography variant="h6" align="center" style={styles.subtitle}>
-          {/* {t('homePage.welcomeSubtitle')} */}
-        من خلال برامج التعلم المباشر المتطورة لدينا، إلى جانب أفضل المعلمين
+        <Box style={{ backgroundColor: 'white', padding: '16px', borderRadius: '8px' }}>
+  <Typography variant="h6" align="center" style={{ fontWeight: 'bold', color: 'black' }}>
+    تعلم من المنزل من خلال برامج التعلم المتطورة لدينا إلى جانب أفضل المعلمين
+  </Typography>
+</Box>
 
-        </Typography>
-
-        <Typography variant="h6" align="center" style={styles.subtitle}>
-          {/* {t('homePage.welcomeSubtitle')} */}
-          مؤسس التعليم المبرمج الحساب الذهني في اليمن
-          المدرب / أواب الخضر 
-
-        </Typography>
-        <Typography variant="h6" align="center" style={styles.subtitle}>
-          {/* {t('homePage.welcomeSubtitle')} */}
-          المدرب / أواب الخضر 
-
-        </Typography>
+       
       </div>
       <Grid container spacing={4} justifyContent="center" style={styles.grid}>
         {adminLoggedIn ? (
@@ -195,7 +185,11 @@ const HomePage = () => {
           </>
         )}
       </Grid>
+      
+      <Footer />
+
     </div>
+    
   );
 };
 
@@ -230,7 +224,7 @@ const styles = {
     width: '90%',
   },
   card: {
-    background: 'rgba(255, 255, 255, 0.1)',
+    background: 'rgb(248, 248, 248)',
     backdropFilter: 'blur(12px)',
     borderRadius: '20px',
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
@@ -248,7 +242,7 @@ const styles = {
     marginBottom: '10px',
   },
   cardText: {
-    color: '#fff',
+    color: '#1565c0',
     marginBottom: '20px',
     fontSize: '1rem',
   },

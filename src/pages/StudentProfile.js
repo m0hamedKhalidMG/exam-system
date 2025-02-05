@@ -85,7 +85,7 @@ const StudentProfile = () => {
           );
           setProfile(updatedProfile);
           
-          console.log('Image uploaded successfully:', response.data);
+          //console.log('Image uploaded successfully:', response.data);
         } catch (error) {
           console.error('Error uploading image:', error);
         }
@@ -110,7 +110,7 @@ const StudentProfile = () => {
           },
         }
       );
-      console.log(profilePic)
+      //console.log(profilePic)
       dispatch(
         updateProfile({
           id: profile.id,

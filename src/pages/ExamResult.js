@@ -23,7 +23,7 @@ const ExamResult = () => {
   const { level, answers } = location.state || {};
   const profile = JSON.parse(localStorage.getItem('userInfo'));
  const [imgprofile, setProfileimg] = useState(null);
-  console.log(profile.username)
+  //console.log(profile.username)
   const exams = useSelector((state) => state.admin.exams);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const ExamResult = () => {
           },
         });
         const userProfile = response.data.user.profileImage;
-      console.log(userProfile)
+      //console.log(userProfile)
         setProfileimg(userProfile || '');
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -50,7 +50,7 @@ const ExamResult = () => {
   }, []);
 
 useEffect(() => {
-    console.log(exams)
+    //console.log(exams)
     if (!exams || exams.length === 0) {
       navigate('/');
     }
@@ -58,7 +58,7 @@ useEffect(() => {
   const currentExam = exams.find((exam) => exam.class === level);
   const questions = currentExam?.questions || [];
   const totalQuestions = questions.length;
-console.log(questions)
+//console.log(questions)
   const score = answers.reduce((correct, answer, index) => {
     const correctAnswer = questions[index]?.correctAnswer?.toString();
     return correct + (answer === correctAnswer ? 1 : 0);

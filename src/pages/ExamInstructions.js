@@ -60,7 +60,7 @@ const ExamInstructions = () => {
       });
     } catch (error) {
       console.error('Failed to start exam:', error);
-      console.log(error.response.data.message)
+      //console.log(error.response.data.message)
       if (error.response.data.message === "You have already started this exam.") {
         alert( "You have already started this exam.");}
         else

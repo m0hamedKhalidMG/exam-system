@@ -37,7 +37,7 @@ const StudentLogin = () => {
         email: formData.email,
         password: formData.password,
       });
-console.log(response)
+//console.log(response)
       if (response.status === 200) {
         localStorage.setItem('token', response.data.token);
         const userInfo = {

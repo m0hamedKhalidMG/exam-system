@@ -12,6 +12,8 @@ import {
   useMediaQuery,
   Select,
 } from '@mui/material';
+import { WhatsApp } from '@mui/icons-material';
+
 import { InputLabel, FormControl } from "@mui/material";
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
@@ -79,15 +81,26 @@ const Navbar = () => {
       <Toolbar />
 
       <AppBar position="fixed" style={styles.navbar}>
-        <Toolbar style={styles.toolbar}>
-          {/* Logo Container */}
-          <Box style={styles.logoContainer}>
+      <Toolbar>
+        {/* Logo and other content */}
+        <Box style={styles.logoContainer}>
             <img
               src={logo}
               alt={t('navbar.title')}
               style={styles.logo}
             />
-          </Box>
+
+          {/* WhatsApp Icon as a link */}
+          <a href="https://wa.me/message/BE6N3ZPIZO5PL1" target="_blank" rel="noopener noreferrer">
+            <IconButton>
+              <WhatsApp style={{ color: '#25D366' }} />
+            </IconButton>
+          </a>
+        </Box>
+          {/* Middle Text */}
+          <Typography variant="h6" style={styles.middleText}>
+            التعليم المبرمج - الحساب الذهني
+          </Typography>
 
           {isMobile ? (
             <>
@@ -238,6 +251,13 @@ const styles = {
     maxWidth: '180px', // Ensure it doesn't get too big
     objectFit: 'contain', // Ensures proper fitting
   },
+  middleText: {
+    flex: 9, // Takes up remaining space
+    textAlign: 'center', // Centers the text
+    fontSize: '20px',
+    fontWeight: 'bold',
+    color: '#000',
+  },
   rightSection: {
     display: 'flex',
     alignItems: 'center',
@@ -259,6 +279,17 @@ const styles = {
   languageSelector: {
     marginLeft: 'auto',
     color: '#000',
+  },
+  whatsappLink: {
+    position: 'absolute',
+    top: '50%',
+    left: '10%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: -1, // Puts the icon behind the logo
+  },
+  whatsappIcon: {
+    fontSize: '60px', // Adjust the icon size as needed
+    color: '#25D366', // WhatsApp green color
   },
 };
 

@@ -60,7 +60,7 @@ const AdminDashboard = () => {
         });
         if (response.status === 200 && Array.isArray(response.data)) {
          // response.data.forEach((exam) => {
-          console.log(response.data)
+          //console.log(response.data)
             dispatch(loadExam(response.data)); // Add each exam to the Redux store
         //  });
         } else {
@@ -225,7 +225,7 @@ const AdminDashboard = () => {
         }
       );
   
-      console.log(`Exam with ID ${id} deleted successfully.`);
+      //console.log(`Exam with ID ${id} deleted successfully.`);
       dispatch(deleteExam(id)); // Remove the exam from Redux store
       alert('Exam deleted successfully!');
     } catch (error) {
@@ -278,8 +278,8 @@ const AdminDashboard = () => {
         }
       );
   const id=selectedExam._id
-      console.log('Response from backend:', response.data.exam); // Log backend response
-      console.log(id)
+      //console.log('Response from backend:', response.data.exam); // Log backend response
+      //console.log(id)
       setSelectedExam(response.data.exam);
       // Dispatch the updated exam to the Redux store
       dispatch(
@@ -338,7 +338,7 @@ const AdminDashboard = () => {
           {t('adminDashboard.selectAgeGroup')}
         </MenuItem>
         <MenuItem value="7">{t('ageGroup.7')}</MenuItem>
-        <MenuItem value="7-10">{t('ageGroup.7_10')}</MenuItem>
+        <MenuItem value="8-10">{t('ageGroup.8_10')}</MenuItem>
         <MenuItem value="10+">{t('ageGroup.10Plus')}</MenuItem>
       </Select>
       <Select
@@ -446,7 +446,7 @@ const AdminDashboard = () => {
           // endDateTime: `${questionData.endDate}T${questionData.endTime}:00`,
         };
 
-        console.log('Exam Data:', examData);
+        //console.log('Exam Data:', examData);
 
         // Call the backend API
         const response = await axios.post(
@@ -461,7 +461,7 @@ const AdminDashboard = () => {
         );
 
         if (response.status === 201) {
-          console.log('Exam created successfully:', response.data.exam);
+          //console.log('Exam created successfully:', response.data.exam);
 
           // Dispatch action to add exam locally
           dispatch(

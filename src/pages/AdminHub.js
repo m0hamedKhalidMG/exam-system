@@ -104,6 +104,28 @@ const AdminHub = () => {
             </CardContent>
           </Card>
         </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Card style={styles.card}>
+            <CardContent>
+              <div style={styles.iconWrapper}>
+                <CloudUploadIcon style={styles.icon} />
+              </div>
+              <Typography variant="h6" align="center" style={styles.cardTitle}>
+              {t('adminHub.degrees')}
+              </Typography>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => handleNavigate('/getdegree')}
+                style={styles.button}
+              >
+              {t('adminHub.Showdegrees')}
+
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
     </div>
   );
