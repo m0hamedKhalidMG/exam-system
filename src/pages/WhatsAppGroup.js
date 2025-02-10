@@ -16,7 +16,7 @@ const WhatsAppGroup = () => {
   };
 
   const handleContinue = () => {
-    navigate('/level-selection'); // Navigate to the next page
+    navigate('/Categories'); // Navigate to the next page
   };
 
   return (
