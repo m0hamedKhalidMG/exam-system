@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import {
   Typography,
   TextField,
   Button,
   Card,
   CardContent,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
   IconButton
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +17,9 @@ import { setProfile, addProfile } from '../redux/studentSlice';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
-
+import { getStates, getCountries } from 'country-state-picker';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 const StudentRegistration = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -32,12 +38,24 @@ const StudentRegistration = () => {
 
   const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
 
+  useEffect(() => {
+    setCountries(getCountries());
+  }, []);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  };
 
+    if (name === 'country') {
+      setStates(getStates(value));
+      setFormData((prev) => ({ ...prev, state: '' }));
+    }
+  };
+  const handlePhoneChange = (value) => {
+    setFormData({ ...formData, phone: value });
+  };
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
@@ -90,6 +108,8 @@ const StudentRegistration = () => {
           const userInfo = {
             id: response.data.user.id,
             username: response.data.user.username,
+            email: response.data.user.email,
+
             role: response.data.user.role,
           };
           localStorage.setItem('userInfo', JSON.stringify(userInfo));
@@ -134,20 +154,76 @@ const StudentRegistration = () => {
               )}
             </div>
 
-            {['name', 'email', 'phone', 'age', 'country', 'state'].map((field) => (
-              <TextField
-                key={field}
-                label={t(`studentRegistration.fields.${field}`)}
-                name={field}
-                fullWidth
-                value={formData[field]}
-                onChange={handleChange}
-                error={!!errors[field]}
-                helperText={errors[field]}
-                style={styles.input}
-                {...(field === 'phone' && { placeholder: 'أكتب الرقم مع مفتاح الدولة' })}
-              />
-            ))}
+            <TextField
+              label={t('studentRegistration.fields.name')}
+              name="name"
+              fullWidth
+              value={formData.name}
+              onChange={handleChange}
+              error={!!errors.name}
+              helperText={errors.name}
+              style={styles.input}
+            />
+            <TextField
+              label={t('studentRegistration.fields.email')}
+              name="email"
+              type="email"
+              fullWidth
+              value={formData.email}
+              onChange={handleChange}
+              error={!!errors.email}
+              helperText={errors.email}
+              style={styles.input}
+            />
+            
+            {/* Age Dropdown */}
+            <FormControl fullWidth style={styles.input}>
+              <InputLabel>{t('studentRegistration.fields.age')}</InputLabel>
+              <Select name="age" value={formData.age} onChange={handleChange}>
+                {Array.from({ length: 8 }, (_, i) => i + 7).map((age) => (
+                  <MenuItem key={age} value={age}>
+                    {age}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.age && <Typography color="error">{errors.age}</Typography>}
+            </FormControl>
+
+            {/* Phone Input with Country Code */}
+            <PhoneInput
+              country={'sa'}
+              value={formData.phone}
+              onChange={handlePhoneChange}
+              inputStyle={{ width: '100%'}}
+            />
+            {errors.phone && <Typography color="error">{errors.phone}</Typography>}
+
+            {/* Country Dropdown */}
+            <FormControl fullWidth style={{ ...styles.input, ...styles.input2 }}>
+            <InputLabel>{t('studentRegistration.fields.country')}</InputLabel>
+              <Select name="country" value={formData.country} onChange={handleChange}>
+                {countries.map((country) => (
+                  <MenuItem key={country.code} value={country.code}>
+                    {country.name}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.country && <Typography color="error">{errors.country}</Typography>}
+            </FormControl>
+
+            {/* State Dropdown */}
+            <FormControl fullWidth style={styles.input} disabled={!states.length}>
+              <InputLabel>{t('studentRegistration.fields.state')}</InputLabel>
+              <Select name="state" value={formData.state} onChange={handleChange}>
+                {states.map((state) => (
+                  <MenuItem key={state} value={state}>
+                    {state}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.state && <Typography color="error">{errors.state}</Typography>}
+            </FormControl>
+
             <TextField
               label={t('studentRegistration.fields.password')}
               name="password"
@@ -159,13 +235,7 @@ const StudentRegistration = () => {
               helperText={errors.password}
               style={styles.input}
             />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              style={styles.button}
-            >
+            <Button type="submit" variant="contained" color="primary" fullWidth style={styles.button}>
               {t('studentRegistration.registerButton')}
             </Button>
             <Typography
@@ -205,6 +275,13 @@ const styles = {
   },
   input: {
     marginBottom: '20px',
+    
+    
+  },
+  input2: {
+    marginTop: '20px',
+    
+    
   },
   button: {
     marginTop: '10px',

@@ -126,6 +126,29 @@ const AdminHub = () => {
             </CardContent>
           </Card>
         </Grid>
+
+
+        <Grid item xs={12} md={4}>
+          <Card style={styles.card}>
+            <CardContent>
+              <div style={styles.iconWrapper}>
+                <CloudUploadIcon style={styles.icon} />
+              </div>
+              <Typography variant="h6" align="center" style={styles.cardTitle}>
+              {t('adminHub.GenerateExamCode')}
+              </Typography>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => handleNavigate('/Generater-code')}
+                style={styles.button}
+              >
+              {t('adminHub.Start')}
+
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
     </div>
   );

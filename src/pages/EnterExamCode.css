@@ -1,0 +1,33 @@
+.exam-code-container {
+    text-align: center;
+    margin-top: 50px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(25, 118, 210, 0.9), rgba(37, 206, 209, 0.8));
+    border-radius: 10px;
+    width: 400px;
+    margin: auto;
+  }
+  
+  .exam-code-input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .verify-button {
+    background-color: #1976d2;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  
+  .error-message {
+    color: red;
+    margin-top: 10px;
+  }
+  

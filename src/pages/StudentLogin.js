@@ -43,13 +43,14 @@ const StudentLogin = () => {
         const userInfo = {
           id: response.data.user.id,
           username: response.data.user.username,
+          email:response.data.user.email,
           role: response.data.user.role,
         };
         localStorage.setItem('userInfo', JSON.stringify(userInfo));
         localStorage.setItem('token', response.data.token); // Save token to localStorage
         dispatch(loginStudent(response.data.user));
 
-        navigate('/level-selection'); // Redirect to level selection page
+        navigate('/Categories'); // Redirect to level selection page
       } else {
         setError(t('studentLogin.invalidCredentials')); // Set error message if no profile found
       }

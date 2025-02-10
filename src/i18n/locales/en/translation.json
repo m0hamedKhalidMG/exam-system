@@ -31,7 +31,9 @@
     "viewStudentsAndCharts": "View Students & Charts",
     "uploadImage":"UploadImage For background ",
     "Showdegrees":"Showdegrees",
-    "degrees":" Get degrees for students"
+    "degrees":" Get degrees for students",
+    "GenerateExamCode":"GenerateExamCode",
+    "Start":"Start"
 
 
   },

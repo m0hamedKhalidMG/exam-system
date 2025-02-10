@@ -81,7 +81,9 @@ const AdminDashboard = () => {
     startTime: '',
     endTime: '',
     duration: '',
+    selectExamCategory:'',
     questions: [],
+    
   });
 
   const [currentQuestion, setCurrentQuestion] = useState({
@@ -183,6 +185,8 @@ const AdminDashboard = () => {
       questionData.startTime &&
       questionData.endTime &&
       questionData.duration &&
+      questionData.selectExamCategory&&
+
       questionData.questions.length > 0
     ) {
       dispatch(
@@ -199,6 +203,7 @@ const AdminDashboard = () => {
         endTime: '',
         duration: '',
         questions: [],
+        selectExamCategory:'',
       });
     } else {
       alert('Please fill out all fields and add at least one question.');
@@ -341,6 +346,25 @@ const AdminDashboard = () => {
         <MenuItem value="8-10">{t('ageGroup.8_10')}</MenuItem>
         <MenuItem value="10+">{t('ageGroup.10Plus')}</MenuItem>
       </Select>
+
+      
+      <Select
+  value={questionData.selectExamCategory}  // Default to "1"
+  onChange={(e) =>
+    setQuestionData({ ...questionData, selectExamCategory: e.target.value })
+  }
+  displayEmpty
+  fullWidth
+  style={styles.input}
+>
+<MenuItem value="">
+اختر فئة الامتحان
+        </MenuItem>
+<MenuItem value="1">التدريب والتأهيل البصري</MenuItem>
+  <MenuItem value="2">التحدي والمنافسة</MenuItem>
+  <MenuItem value="3">اختبار قياس وتحديد المستوى</MenuItem>
+</Select>
+
       <Select
         value={questionData.level}
         onChange={(e) =>
@@ -429,6 +453,7 @@ const AdminDashboard = () => {
       questionData.endDate &&
       questionData.endTime &&
       questionData.duration &&
+      questionData.selectExamCategory&&
       questionData.questions.length > 0
     ) {
       try {
@@ -446,7 +471,7 @@ const AdminDashboard = () => {
           // endDateTime: `${questionData.endDate}T${questionData.endTime}:00`,
         };
 
-        //console.log('Exam Data:', examData);
+        console.log('Exam Data:', examData);
 
         // Call the backend API
         const response = await axios.post(
@@ -482,6 +507,7 @@ const AdminDashboard = () => {
             endDate: '',
             endTime: '',
             duration: '',
+            selectExamCategory:'',
             questions: [],
           });
         } else {
@@ -492,6 +518,7 @@ const AdminDashboard = () => {
         alert('An error occurred while creating the exam. Please try again.');
       }
     } else {
+      console.log(questionData)
       alert(t('adminDashboard.incompleteExamAlert'));
     }
   }}

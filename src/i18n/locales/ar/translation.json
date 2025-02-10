@@ -33,7 +33,9 @@
     "uploadImage":" رفع صوره للخلفيه",
     "viewStudentsAndCharts": "عرض الطلاب والرسوم البيانية",
     "Showdegrees":"عرض درجات الطلاب",
-    "degrees":" الحصول علي درجات الطلاب"
+    "degrees":" الحصول علي درجات الطلاب",
+    "GenerateExamCode":"توليد كود الامتحان",
+    "Start":"ابدأ"
   },
   "adminLogin": {
     "title": "تسجيل دخول المدير",

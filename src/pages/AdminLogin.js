@@ -32,15 +32,16 @@ const AdminLogin = () => {
     try {
       const response = await axios.post('https://exam-server-psi.vercel.app/api/auth/login', credentials);
       
-      if (response.status === 200) {
+      if (response.status === 200&&response.data.user.role=='admin') {
         // Save admin information in Redux
         localStorage.setItem('token', response.data.token);
-
+const role=response?.data.user.role||'null'
         // Store admin data in localStorage
-        localStorage.setItem('userInfo', JSON.stringify({ role: 'admin'}));
-
-        navigate('/admin-hub');
+        localStorage.setItem('userInfo', JSON.stringify({ role}));
+if(role==='admin'){
+        navigate('/admin-hub');}
       } else {
+        alert("you have not premession to acess this page")
         setError(true);
       }
     } catch (error) {

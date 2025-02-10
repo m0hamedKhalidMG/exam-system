@@ -103,7 +103,7 @@ const HomePage = () => {
                 <Button
                   variant="contained"
                   fullWidth
-                  onClick={() => navigate('/level-selection')}
+                  onClick={() => navigate('/Categories')}
                   style={styles.button}
                 >
                   {t('homePage.studentButton')}

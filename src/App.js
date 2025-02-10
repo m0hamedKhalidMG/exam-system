@@ -22,10 +22,11 @@ import StudentLogin from './pages/StudentLogin'; // Add Login Page
 import AdminViewStudents from './pages/AdminViewStudents';
 import AdminBestStudents from './pages/AdminBestStudents';
 import ExamHistory from './pages/ExamHistory';
-
+import CategoriesPage from './pages/CategoriesPage';
 import AdminHub from './pages/AdminHub';
 import ImageUpload from './pages/uploadimage';
-
+import GenerateExamCode from './pages/GenerateExamCode';
+import VerifyExamCode from './pages/VerifyExamCode';
 const store = configureStore({
   reducer: {
     admin: adminReducer,
@@ -42,8 +43,10 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="upload-image" element={<ImageUpload />} />
-          
+          <Route path="/Generater-code" element={<GenerateExamCode />} />
+          <Route path="/verify-code" element={<VerifyExamCode />} />
           <Route path="/getdegree" element={<ExamHistory />} />
+          <Route path="/Categories" element={<CategoriesPage />} />
 
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin-hub" element={<AdminHub />} />
