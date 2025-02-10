@@ -29,7 +29,7 @@ const HomePage = () => {
       <div style={styles.heroSection}>
         <Typography variant="h2" align="center" style={styles.title}>
           {/* {t('homePage.welcomeTitle')} */}
-          أطلق العِنان لإمكانات إبنك 
+          أطلق العِنان لإمكانات طفلك 
 
         </Typography>
         <Box style={{ backgroundColor: 'white', padding: '16px', borderRadius: '8px' }}>

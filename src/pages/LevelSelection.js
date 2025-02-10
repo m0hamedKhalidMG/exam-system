@@ -79,8 +79,7 @@ const LevelSelection = () => {
       <Card style={styles.card}>
         <CardContent>
           <Typography variant="h4" align="center" style={styles.title}>
-            {t('levelSelection.title')}
-          </Typography>
+          تعلم - تدرب - تقدم           </Typography>
           <Typography variant="body1" align="center" style={styles.subtitle}>
             {t('levelSelection.subtitle')}
           </Typography>

@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import "./CategoriesPage.css"; // Import the CSS file
 
 const categories = [
-  { id: "1", title: "التدريب والتأهيل البصري", description: "تحسين الأداء البصري من خلال تمارين متقدمة." },
-  { id: "3", title: "اختبار قياس وتحديد المستوى", description: "اختبار دقيق لمعرفة مستوى الأداء الحالي." },
-  { id: "2", title: "التحدي والمنافسة", description: "منافسة ممتعة لرفع مستوى التحدي." },
+  { id: "1", title: "التدريب والتأهيل البصري", description: "السرعة والخيال الذهني "},
+  { id: "3", title: "اختبار قياس وتحديد المستوى", description: "مستويات متقدمة _مشاركة في البطولات ✅المحلية-الدولية-العالمية" },
+  { id: "2", title: "التحدي والمنافسة", description: "أحصل على الجوائز والتكريمات" },
 ];
 
 const CategoriesPage = () => {
