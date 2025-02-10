@@ -19,6 +19,11 @@ console.log(examId)
     alert("يجب تسجيل البريد الإلكتروني أولًا!");
     return;
   }
+  if(examId==="1"){
+    navigate("/level-selection",{ state: { examId } }); // Pass examId to next page
+    return;
+
+  }
     navigate("/verify-code", { state: {emailStudent, examId } }); // Pass examId to next page
   };
 

@@ -38,7 +38,7 @@ const ExamInstructions = () => {
   const handleStartExam = async () => {
     try {
       // API call to start the exam
-      const response = await axios.post('https://exam-server-psi.vercel.app/api/exam/start', {
+      const response = await axios.post('http://localhost:5000/api/exam/start', {
         userId: userInfo.id, // Replace with the actual user ID (from state or Redux)
         examId: selectedExam._id, // Replace with the selected exam ID
       }, {

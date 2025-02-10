@@ -3,6 +3,8 @@ import { Typography, Button, Card, CardContent, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import { useLocation } from "react-router-dom";
+
 import { useSelector, useDispatch } from 'react-redux';
 import {
  
@@ -15,13 +17,14 @@ const LevelSelection = () => {
   const [exams, setExams] = useState([]);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState(null);
   const dispatch = useDispatch();
-
+  const location = useLocation();
+  const { examId } = location.state || {};
   useEffect(() => {
     const fetchExams = async () => {
       try {
         const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
         const response = await axios.get(
-          'https://exam-server-psi.vercel.app/api/exam/Examsforstudent',
+          `http://localhost:5000/api/exam/Examsforstudent/${examId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`, // Add Bearer token to the headers
@@ -31,6 +34,7 @@ const LevelSelection = () => {
         );
         //console.log(response.data)
         setExams(response.data || []); // Adjust based on API response structure
+        console.log(response.data)
   dispatch(loadExam(response.data));
 
         
