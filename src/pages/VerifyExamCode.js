@@ -3,6 +3,7 @@ import axios from "axios";
 import { TextField, Button, Typography, Card, CardContent } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import "./VerifyExamCode.css"; // Updated CSS
+import { useNavigate } from 'react-router-dom';
 
 const VerifyExamCode = () => {
   const location = useLocation();
@@ -10,6 +11,7 @@ const VerifyExamCode = () => {
   const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleVerifyCode = async () => {
     if (!emailStudent || !examId || !code) {
@@ -25,6 +27,8 @@ const VerifyExamCode = () => {
       });
 
       setMessage(response.data.message);
+      navigate("/level-selection",{ state: { examId } }); // Pass examId to next page
+
       setError("");
     } catch (err) {
       setError(err.response?.data?.error || "حدث خطأ أثناء التحقق من الكود");

@@ -24,7 +24,7 @@ const LevelSelection = () => {
       try {
         const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
         const response = await axios.get(
-          `http://localhost:5000/api/exam/Examsforstudent/${examId}`,
+          `https://exam-server-psi.vercel.app/api/exam/Examsforstudent/${examId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`, // Add Bearer token to the headers

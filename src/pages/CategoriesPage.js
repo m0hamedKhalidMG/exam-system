@@ -12,19 +12,20 @@ const CategoriesPage = () => {
   const navigate = useNavigate();
 
   const handleSelectCategory = (examId) => {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    const emailStudent = userInfo.email;
-console.log(examId)
-  if (!emailStudent) {
-    alert("يجب تسجيل البريد الإلكتروني أولًا!");
-    return;
-  }
-  if(examId==="1"){
-    navigate("/level-selection",{ state: { examId } }); // Pass examId to next page
-    return;
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    const emailStudent = userInfo?.email;
 
-  }
-    navigate("/verify-code", { state: {emailStudent, examId } }); // Pass examId to next page
+    if (!emailStudent) {
+      alert("يجب تسجيل البريد الإلكتروني أولًا!");
+      return;
+    }
+
+    if (examId === "1") {
+      navigate("/level-selection", { state: { examId } });
+      return;
+    }
+
+    navigate("/verify-code", { state: { emailStudent, examId } });
   };
 
   return (
