@@ -16,9 +16,14 @@ import {
   TableBody,
   Modal,
   Box,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  FormControl,
+  FormLabel,
+  Checkbox,
 } from '@mui/material';
 import axios from 'axios';
-
 import {
   AddCircleOutline,
   RemoveCircleOutline,
@@ -26,77 +31,96 @@ import {
   Edit,
 } from '@mui/icons-material';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  addQuestion,
-  addExam,
-  loadExam,
-  deleteExam,
-  updateExam,
-} from '../redux/adminSlice';
+import { addExam, loadExam, deleteExam, updateExam } from '../redux/adminSlice';
 import { useTranslation } from 'react-i18next';
 
 const AdminDashboard = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const exams = useSelector((state) => state.admin.exams);
-  const questions = useSelector((state) => state.admin.questions);
-  const students = useSelector((state) => state.admin.students);
 
-  // Fetch all exams and add them to Redux store on component mount
+  // -----------------------------
+  //  FETCH ALL EXAMS ON LOAD
+  // -----------------------------
   useEffect(() => {
     const fetchExams = async () => {
       try {
-        const token = localStorage.getItem('token'); // Retrieve token from localStorage
-
+        const token = localStorage.getItem('token');
         if (!token) {
           alert('Authentication token is missing. Please log in again.');
           return;
         }
-
-        const response = await axios.get('https://exam-server-psi.vercel.app/api/exam', {
-          headers: {
-            Authorization: `Bearer ${token}`, // Add token to Authorization header
-          },
-        });
+        const response = await axios.get(
+          'https://exam-server-psi.vercel.app/api/exam',
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         if (response.status === 200 && Array.isArray(response.data)) {
-         // response.data.forEach((exam) => {
-          //console.log(response.data)
-            dispatch(loadExam(response.data)); // Add each exam to the Redux store
-        //  });
+          dispatch(loadExam(response.data));
         } else {
           alert('Failed to fetch exams. Please try again.');
         }
       } catch (error) {
-        console.error('Error fetching exams:', error.response?.data || error.message);
+        console.error(
+          'Error fetching exams:',
+          error.response?.data || error.message
+        );
         alert('An error occurred while fetching exams. Please try again.');
       }
     };
-
     fetchExams();
-  }, [dispatch]); // Dependency array ensures this runs only on component mount
+  }, [dispatch]);
 
+  // ------------------------------------------
+  //  STATE FOR NEW EXAM & QUESTIONS
+  // ------------------------------------------
   const [questionData, setQuestionData] = useState({
     level: '',
     ageGroup: '',
+    selectExamCategory: '',
+    startDate: '',
     startTime: '',
+    endDate: '',
     endTime: '',
     duration: '',
-    selectExamCategory:'',
     questions: [],
-    
+    generationMethod: 'manual', // 'manual' or 'automatic'
   });
 
+  // ------------------------------------------
+  //  MANUAL QUESTION CREATION
+  // ------------------------------------------
   const [currentQuestion, setCurrentQuestion] = useState({
     numbers: [{ id: 1, value: '' }],
     operations: [],
     correctAnswer: '',
   });
 
-  const [openModal, setOpenModal] = useState(false);
-  const [modalAction, setModalAction] = useState('');
-  const [selectedExam, setSelectedExam] = useState(null);
+  // ------------------------------------------
+  //  AUTOMATIC QUESTION CREATION CONFIG
+  // ------------------------------------------
+  const [autoGenConfig, setAutoGenConfig] = useState({
+    minNumber: 0,
+    maxNumber: 9,
+    questionsPerPage: 5,
+    numberOfPages: 1,
+    operations: {
+      plus: true,
+      minus: false,
+      multiply: false,
+      divide: false,
+    },
+  });
 
-  // Calculate the correct answer dynamically
+  // ------------------------------------------
+  //  PREVIEW FOR AUTO-GENERATED QUESTIONS
+  // ------------------------------------------
+  const [autoGenPreview, setAutoGenPreview] = useState([]);
+
+  // ------------------------------------------
+  //  AUTO-CALCULATE CORRECT ANSWER (MANUAL)
+  // ------------------------------------------
   useEffect(() => {
     if (
       currentQuestion.numbers.length > 1 &&
@@ -121,6 +145,9 @@ const AdminDashboard = () => {
     }
   }, [currentQuestion.numbers, currentQuestion.operations, t]);
 
+  // ------------------------------------------
+  //  HANDLERS: MANUAL QUESTION
+  // ------------------------------------------
   const handleAddNumber = () => {
     setCurrentQuestion({
       ...currentQuestion,
@@ -178,67 +205,170 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleScheduleExam = () => {
-    if (
-      questionData.level &&
-      questionData.ageGroup &&
-      questionData.startTime &&
-      questionData.endTime &&
-      questionData.duration &&
-      questionData.selectExamCategory&&
+  // ------------------------------------------
+  //  HANDLERS: AUTOMATIC QUESTION
+  // ------------------------------------------
+  const handleAutoGeneration = () => {
+    const {
+      minNumber,
+      maxNumber,
+      questionsPerPage,
+      numberOfPages,
+      operations,
+    } = autoGenConfig;
+    const ops = [];
+    if (operations.plus) ops.push('+');
+    if (operations.minus) ops.push('-');
+    if (operations.multiply) ops.push('*');
+    if (operations.divide) ops.push('/');
 
-      questionData.questions.length > 0
-    ) {
-      dispatch(
-        addExam({
-          ...questionData,
-          id: Date.now(),
-        })
-      );
-      alert('Exam scheduled successfully!');
-      setQuestionData({
-        level: '',
-        ageGroup: '',
-        startTime: '',
-        endTime: '',
-        duration: '',
-        questions: [],
-        selectExamCategory:'',
-      });
-    } else {
-      alert('Please fill out all fields and add at least one question.');
+    if (ops.length === 0) {
+      alert('Please select at least one operation for auto-generation.');
+      return;
     }
+
+    const totalQuestionsToGenerate = questionsPerPage * numberOfPages;
+    const generatedQuestions = [];
+
+    for (let i = 0; i < totalQuestionsToGenerate; i++) {
+      const randomNum1 =
+        Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
+      const randomNum2 =
+        Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
+      const randomOp = ops[Math.floor(Math.random() * ops.length)];
+
+      const questionObj = {
+        numbers: [
+          { id: 1, value: randomNum1.toString() },
+          { id: 2, value: randomNum2.toString() },
+        ],
+        operations: [randomOp],
+        correctAnswer: '',
+      };
+
+      try {
+        const expression = `${randomNum1} ${randomOp} ${randomNum2}`;
+        const evalResult = eval(expression);
+        questionObj.correctAnswer = evalResult.toString();
+      } catch {
+        questionObj.correctAnswer = '';
+      }
+      generatedQuestions.push(questionObj);
+    }
+    setAutoGenPreview(generatedQuestions);
   };
 
-  const handleDeleteExam = async (id) => {
+  const handleConfirmAutoGen = () => {
+    setQuestionData({ ...questionData, questions: autoGenPreview });
+    setAutoGenPreview([]);
+  };
+
+  const handleDiscardAutoGen = () => {
+    setAutoGenPreview([]);
+  };
+
+  // ------------------------------------------
+  //  CREATE EXAM (POST TO BACKEND)
+  // ------------------------------------------
+  const handleCreateExam = async () => {
+    if (
+      !questionData.level ||
+      !questionData.ageGroup ||
+      !questionData.selectExamCategory ||
+      !questionData.startDate ||
+      !questionData.startTime ||
+      !questionData.endDate ||
+      !questionData.endTime ||
+      !questionData.duration
+    ) {
+      alert(t('adminDashboard.incompleteExamAlert'));
+      return;
+    }
+    if (questionData.questions.length === 0) {
+      alert('Please add at least one question (manually or automatically).');
+      return;
+    }
+
     try {
-      const token = localStorage.getItem('token'); // Retrieve the token from localStorage
-  
+      const token = localStorage.getItem('token');
       if (!token) {
         alert('Authentication token is missing. Please log in again.');
         return;
       }
-  
-      // Make the DELETE request to the backend
-      await axios.delete(
-        `https://exam-server-psi.vercel.app/api/exam/delete/${id}`, // Backend API endpoint
+
+      const examData = { ...questionData };
+
+      const response = await axios.post(
+        'https://exam-server-psi.vercel.app/api/exam/create',
+        examData,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Add Bearer token to the headers
-            'Content-Type': 'application/json', // Set content type
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
         }
       );
-  
-      //console.log(`Exam with ID ${id} deleted successfully.`);
-      dispatch(deleteExam(id)); // Remove the exam from Redux store
+
+      if (response.status === 201) {
+        dispatch(addExam(response.data.exam));
+        alert(t('adminDashboard.examScheduled'));
+        setQuestionData({
+          level: '',
+          ageGroup: '',
+          selectExamCategory: '',
+          startDate: '',
+          startTime: '',
+          endDate: '',
+          endTime: '',
+          duration: '',
+          questions: [],
+          generationMethod: 'manual',
+        });
+      } else {
+        alert('Failed to create the exam. Please try again.');
+      }
+    } catch (error) {
+      console.error(
+        'Error creating exam:',
+        error.response?.data || error.message
+      );
+      alert('An error occurred while creating the exam. Please try again.');
+    }
+  };
+
+  // ------------------------------------------
+  //  DELETE EXAM
+  // ------------------------------------------
+  const handleDeleteExam = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Authentication token is missing. Please log in again.');
+        return;
+      }
+      await axios.delete(
+        `https://exam-server-psi.vercel.app/api/exam/delete/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      dispatch(deleteExam(id));
       alert('Exam deleted successfully!');
     } catch (error) {
       console.error('Error deleting exam:', error);
       alert('Failed to delete the exam. Please try again.');
     }
   };
-  
+
+  // ------------------------------------------
+  //  EDIT EXAM (MODAL)
+  // ------------------------------------------
+  const [openModal, setOpenModal] = useState(false);
+  const [modalAction, setModalAction] = useState('');
+  const [selectedExam, setSelectedExam] = useState(null);
 
   const handleEditExam = (id) => {
     const examToEdit = exams.find((exam) => exam._id === id);
@@ -249,51 +379,25 @@ const AdminDashboard = () => {
     }
   };
 
-  const updateQuestionInExam = (index, value) => {
-    const updatedQuestions = [...selectedExam.questions];
-    updatedQuestions[index] = { ...updatedQuestions[index], text: value }; // Update the text property
-    setSelectedExam({ ...selectedExam, questions: updatedQuestions });
-  };
-
-  const deleteQuestionInExam = (index) => {
-    const updatedQuestions = selectedExam.questions.filter(
-      (_, i) => i !== index
-    );
-    setSelectedExam({ ...selectedExam, questions: updatedQuestions });
-  };
-
-  const saveEditedExam = async (id) => { // Add `async` here
+  const saveEditedExam = async (id) => {
     try {
-      const token = localStorage.getItem('token'); // Retrieve token from localStorage
-  
+      const token = localStorage.getItem('token');
       if (!token) {
         alert('Authentication token is missing. Please log in again.');
         return;
       }
-  
-      // Make the API call to update the exam
       const response = await axios.put(
-        `https://exam-server-psi.vercel.app/api/exam/update/${selectedExam._id}`, // Backend API URL
-        selectedExam, // Pass the updated exam data
+        `https://exam-server-psi.vercel.app/api/exam/update/${selectedExam._id}`,
+        selectedExam,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Add Bearer token in headers
-            'Content-Type': 'application/json', // Set content type
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
         }
       );
-  const id=selectedExam._id
-      //console.log('Response from backend:', response.data.exam); // Log backend response
-      //console.log(id)
-      setSelectedExam(response.data.exam);
-      // Dispatch the updated exam to the Redux store
-      dispatch(
-        updateExam({
-          id,
-          updatedExam: response.data.exam, 
-        })
-      );
-  
+      const updatedExam = response.data.exam;
+      dispatch(updateExam({ id, updatedExam }));
       alert('Exam updated successfully!');
       setOpenModal(false);
     } catch (error) {
@@ -301,7 +405,8 @@ const AdminDashboard = () => {
       alert('Failed to update exam. Please try again.');
     }
   };
-  
+
+  // Helper to recalc the correct answer in the modal
   const calculateAnswer = (numbers, operations) => {
     try {
       const expression = numbers
@@ -322,299 +427,436 @@ const AdminDashboard = () => {
       <Typography variant="h3" gutterBottom align="center" style={styles.title}>
         {t('adminDashboard.title')}
       </Typography>
-
       <Grid container spacing={4}>
-      <Grid item xs={12} md={6}>
-  <Card style={styles.card}>
-    <CardContent>
-      <Typography variant="h5" gutterBottom style={styles.cardTitle}>
-        {t('adminDashboard.createExam')}
-      </Typography>
-      <Select
-        value={questionData.ageGroup}
-        onChange={(e) =>
-          setQuestionData({ ...questionData, ageGroup: e.target.value })
-        }
-        displayEmpty
-        fullWidth
-        style={styles.input}
-      >
-        <MenuItem value="">
-          {t('adminDashboard.selectAgeGroup')}
-        </MenuItem>
-        <MenuItem value="7">{t('ageGroup.7')}</MenuItem>
-        <MenuItem value="8-10">{t('ageGroup.8_10')}</MenuItem>
-        <MenuItem value="10+">{t('ageGroup.10Plus')}</MenuItem>
-      </Select>
-
-      
-      <Select
-  value={questionData.selectExamCategory}  // Default to "1"
-  onChange={(e) =>
-    setQuestionData({ ...questionData, selectExamCategory: e.target.value })
-  }
-  displayEmpty
-  fullWidth
-  style={styles.input}
->
-<MenuItem value="">
-اختر فئة الامتحان
-        </MenuItem>
-<MenuItem value="1">التدريب والتأهيل البصري</MenuItem>
-  <MenuItem value="2">التحدي والمنافسة</MenuItem>
-  <MenuItem value="3">اختبار قياس وتحديد المستوى</MenuItem>
-</Select>
-
-      <Select
-        value={questionData.level}
-        onChange={(e) =>
-          setQuestionData({ ...questionData, level: e.target.value })
-        }
-        displayEmpty
-        fullWidth
-        style={styles.input}
-      >
-        <MenuItem value="">{t('adminDashboard.selectLevel')}</MenuItem>
-        <MenuItem value="A">{t('level.A')}</MenuItem>
-        <MenuItem value="B">{t('level.B')}</MenuItem>
-        <MenuItem value="C">{t('level.C')}</MenuItem>
-      </Select>
-      <TextField
-        label={t('adminDashboard.startDate')}
-        type="date"
-        fullWidth
-        value={questionData.startDate}
-        onChange={(e) =>
-          setQuestionData({ ...questionData, startDate: e.target.value })
-        }
-        InputLabelProps={{
-          shrink: true,
-        }}
-        style={styles.input}
-      />
-      <TextField
-        label={t('adminDashboard.startTime')}
-        type="time"
-        fullWidth
-        value={questionData.startTime}
-        onChange={(e) =>
-          setQuestionData({ ...questionData, startTime: e.target.value })
-        }
-        InputLabelProps={{
-          shrink: true,
-        }}
-        style={styles.input}
-      />
-      <TextField
-        label={t('adminDashboard.endDate')}
-        type="date"
-        fullWidth
-        value={questionData.endDate}
-        onChange={(e) =>
-          setQuestionData({ ...questionData, endDate: e.target.value })
-        }
-        InputLabelProps={{
-          shrink: true,
-        }}
-        style={styles.input}
-      />
-      <TextField
-        label={t('adminDashboard.endTime')}
-        type="time"
-        fullWidth
-        value={questionData.endTime}
-        onChange={(e) =>
-          setQuestionData({ ...questionData, endTime: e.target.value })
-        }
-        InputLabelProps={{
-          shrink: true,
-        }}
-        style={styles.input}
-      />
-      <TextField
-        label={t('adminDashboard.duration')}
-        fullWidth
-        value={questionData.duration}
-        onChange={(e) =>
-          setQuestionData({ ...questionData, duration: e.target.value })
-        }
-        style={styles.input}
-      />
-   <Button
-  variant="contained"
-  color="primary"
-  fullWidth
-  onClick={async () => {
-    if (
-      questionData.level &&
-      questionData.ageGroup &&
-      questionData.startDate &&
-      questionData.startTime &&
-      questionData.endDate &&
-      questionData.endTime &&
-      questionData.duration &&
-      questionData.selectExamCategory&&
-      questionData.questions.length > 0
-    ) {
-      try {
-        const token = localStorage.getItem('token'); // Retrieve token from localStorage
-
-        if (!token) {
-          alert('Authentication token is missing. Please log in again.');
-          return;
-        }
-
-        // Combine date and time fields into ISO strings for backend
-        const examData = {
-          ...questionData,
-          // startDateTime: `${questionData.startDate}T${questionData.startTime}:00`,
-          // endDateTime: `${questionData.endDate}T${questionData.endTime}:00`,
-        };
-
-        console.log('Exam Data:', examData);
-
-        // Call the backend API
-        const response = await axios.post(
-          'https://exam-server-psi.vercel.app/api/exam/create',
-          examData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Add token to Authorization header
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (response.status === 201) {
-          //console.log('Exam created successfully:', response.data.exam);
-
-          // Dispatch action to add exam locally
-          dispatch(
-            addExam({
-              ...questionData,
-              id: Date.now(),
-            })
-          );
-
-          alert(t('adminDashboard.examScheduled'));
-
-          // Reset the form data
-          setQuestionData({
-            level: '',
-            ageGroup: '',
-            startDate: '',
-            startTime: '',
-            endDate: '',
-            endTime: '',
-            duration: '',
-            selectExamCategory:'',
-            questions: [],
-          });
-        } else {
-          alert('Failed to create the exam. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error creating exam:', error.response?.data || error.message);
-        alert('An error occurred while creating the exam. Please try again.');
-      }
-    } else {
-      console.log(questionData)
-      alert(t('adminDashboard.incompleteExamAlert'));
-    }
-  }}
-  style={styles.button}
->
-  {t('adminDashboard.scheduleExam')}
-</Button>
-
-    </CardContent>
-  </Card>
-</Grid>
-
-
+        {/* CREATE EXAM (LEFT) */}
         <Grid item xs={12} md={6}>
           <Card style={styles.card}>
             <CardContent>
               <Typography variant="h5" gutterBottom style={styles.cardTitle}>
-                {t('adminDashboard.addQuestion')}
+                {t('adminDashboard.createExam')}
               </Typography>
-              {currentQuestion.numbers.map((num) => (
-                <div key={num.id} style={styles.optionContainer}>
-                  <TextField
-                    label={`${t('adminDashboard.number')} ${num.id}`}
-                    fullWidth
-                    value={num.value}
-                    onChange={(e) => handleNumberChange(num.id, e.target.value)}
-                    style={styles.input}
-                  />
-                  {num.id > 1 && (
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleRemoveNumber(num.id)}
-                      style={styles.iconButton}
-                    >
-                      <RemoveCircleOutline />
-                    </IconButton>
-                  )}
-                </div>
-              ))}
-              {currentQuestion.numbers.length > 1 &&
-                currentQuestion.numbers.length - 1 ===
-                  currentQuestion.operations.length &&
-                currentQuestion.numbers.map((_, index) =>
-                  index < currentQuestion.numbers.length - 1 ? (
-                    <Select
-                      key={`operation-${index}`}
-                      value={currentQuestion.operations[index] || ''}
-                      onChange={(e) =>
-                        handleOperationChange(index, e.target.value)
-                      }
-                      displayEmpty
-                      fullWidth
-                      style={styles.input}
-                    >
-                      <MenuItem value="">
-                        {t('adminDashboard.selectOperation')}
-                      </MenuItem>
-                      <MenuItem value="+">{t('operations.addition')}</MenuItem>
-                      <MenuItem value="-">
-                        {t('operations.subtraction')}
-                      </MenuItem>
-                      <MenuItem value="*">
-                        {t('operations.multiplication')}
-                      </MenuItem>
-                      <MenuItem value="/">{t('operations.division')}</MenuItem>
-                    </Select>
-                  ) : null
-                )}
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={handleAddNumber}
-                style={styles.addButton}
-              >
-                {t('adminDashboard.addNumber')}
-              </Button>
-              <TextField
-                label={t('adminDashboard.correctAnswer')}
+              <Select
+                value={questionData.ageGroup}
+                onChange={(e) =>
+                  setQuestionData({ ...questionData, ageGroup: e.target.value })
+                }
+                displayEmpty
                 fullWidth
-                value={currentQuestion.correctAnswer}
-                disabled
+                style={styles.input}
+              >
+                <MenuItem value="">
+                  {t('adminDashboard.selectAgeGroup')}
+                </MenuItem>
+                <MenuItem value="7">{t('ageGroup.7')}</MenuItem>
+                <MenuItem value="8-10">{t('ageGroup.8_10')}</MenuItem>
+                <MenuItem value="10+">{t('ageGroup.10Plus')}</MenuItem>
+              </Select>
+              <Select
+                value={questionData.selectExamCategory}
+                onChange={(e) =>
+                  setQuestionData({
+                    ...questionData,
+                    selectExamCategory: e.target.value,
+                  })
+                }
+                displayEmpty
+                fullWidth
+                style={styles.input}
+              >
+                <MenuItem value="">اختر فئة الامتحان</MenuItem>
+                <MenuItem value="1">التدريب والتأهيل البصري</MenuItem>
+                <MenuItem value="2">التحدي والمنافسة</MenuItem>
+                <MenuItem value="3">اختبار قياس وتحديد المستوى</MenuItem>
+              </Select>
+              <Select
+                value={questionData.level}
+                onChange={(e) =>
+                  setQuestionData({ ...questionData, level: e.target.value })
+                }
+                displayEmpty
+                fullWidth
+                style={styles.input}
+              >
+                <MenuItem value="">{t('adminDashboard.selectLevel')}</MenuItem>
+                <MenuItem value="A">{t('level.A')}</MenuItem>
+                <MenuItem value="B">{t('level.B')}</MenuItem>
+                <MenuItem value="C">{t('level.C')}</MenuItem>
+              </Select>
+              <TextField
+                label={t('adminDashboard.startDate')}
+                type="date"
+                fullWidth
+                value={questionData.startDate}
+                onChange={(e) =>
+                  setQuestionData({
+                    ...questionData,
+                    startDate: e.target.value,
+                  })
+                }
+                InputLabelProps={{ shrink: true }}
                 style={styles.input}
               />
+              <TextField
+                label={t('adminDashboard.startTime')}
+                type="time"
+                fullWidth
+                value={questionData.startTime}
+                onChange={(e) =>
+                  setQuestionData({
+                    ...questionData,
+                    startTime: e.target.value,
+                  })
+                }
+                InputLabelProps={{ shrink: true }}
+                style={styles.input}
+              />
+              <TextField
+                label={t('adminDashboard.endDate')}
+                type="date"
+                fullWidth
+                value={questionData.endDate}
+                onChange={(e) =>
+                  setQuestionData({ ...questionData, endDate: e.target.value })
+                }
+                InputLabelProps={{ shrink: true }}
+                style={styles.input}
+              />
+              <TextField
+                label={t('adminDashboard.endTime')}
+                type="time"
+                fullWidth
+                value={questionData.endTime}
+                onChange={(e) =>
+                  setQuestionData({ ...questionData, endTime: e.target.value })
+                }
+                InputLabelProps={{ shrink: true }}
+                style={styles.input}
+              />
+              <TextField
+                label={t('adminDashboard.duration')}
+                fullWidth
+                value={questionData.duration}
+                onChange={(e) =>
+                  setQuestionData({ ...questionData, duration: e.target.value })
+                }
+                style={styles.input}
+              />
+              <FormControl component="fieldset" style={styles.input}>
+                <FormLabel component="legend">
+                  هل تريد إدخال الأسئلة يدوياً أم تلقائياً؟
+                </FormLabel>
+                <RadioGroup
+                  row
+                  value={questionData.generationMethod}
+                  onChange={(e) =>
+                    setQuestionData({
+                      ...questionData,
+                      generationMethod: e.target.value,
+                      questions: [],
+                    })
+                  }
+                >
+                  <FormControlLabel
+                    value="manual"
+                    control={<Radio color="primary" />}
+                    label="يدوياً (Manual)"
+                  />
+                  <FormControlLabel
+                    value="automatic"
+                    control={<Radio color="primary" />}
+                    label="تلقائياً (Automatic)"
+                  />
+                </RadioGroup>
+              </FormControl>
+              {questionData.generationMethod === 'automatic' && (
+                <Card style={{ padding: '16px', marginBottom: '16px' }}>
+                  <Typography variant="h6" gutterBottom>
+                    إعداد الأسئلة التلقائية
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <TextField
+                        label="الحد الأدنى للرقم"
+                        type="number"
+                        fullWidth
+                        value={autoGenConfig.minNumber}
+                        onChange={(e) =>
+                          setAutoGenConfig({
+                            ...autoGenConfig,
+                            minNumber: parseInt(e.target.value, 10),
+                          })
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        label="الحد الأقصى للرقم"
+                        type="number"
+                        fullWidth
+                        value={autoGenConfig.maxNumber}
+                        onChange={(e) =>
+                          setAutoGenConfig({
+                            ...autoGenConfig,
+                            maxNumber: parseInt(e.target.value, 10),
+                          })
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        label="عدد الأسئلة في كل صفحة"
+                        type="number"
+                        fullWidth
+                        value={autoGenConfig.questionsPerPage}
+                        onChange={(e) =>
+                          setAutoGenConfig({
+                            ...autoGenConfig,
+                            questionsPerPage: parseInt(e.target.value, 10),
+                          })
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        label="عدد الصفحات"
+                        type="number"
+                        fullWidth
+                        value={autoGenConfig.numberOfPages}
+                        onChange={(e) =>
+                          setAutoGenConfig({
+                            ...autoGenConfig,
+                            numberOfPages: parseInt(e.target.value, 10),
+                          })
+                        }
+                      />
+                    </Grid>
+                  </Grid>
+                  <Box mt={2}>
+                    <Typography>العمليات:</Typography>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={autoGenConfig.operations.plus}
+                          onChange={(e) =>
+                            setAutoGenConfig({
+                              ...autoGenConfig,
+                              operations: {
+                                ...autoGenConfig.operations,
+                                plus: e.target.checked,
+                              },
+                            })
+                          }
+                        />
+                      }
+                      label="جمع (+)"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={autoGenConfig.operations.minus}
+                          onChange={(e) =>
+                            setAutoGenConfig({
+                              ...autoGenConfig,
+                              operations: {
+                                ...autoGenConfig.operations,
+                                minus: e.target.checked,
+                              },
+                            })
+                          }
+                        />
+                      }
+                      label="طرح (-)"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={autoGenConfig.operations.multiply}
+                          onChange={(e) =>
+                            setAutoGenConfig({
+                              ...autoGenConfig,
+                              operations: {
+                                ...autoGenConfig.operations,
+                                multiply: e.target.checked,
+                              },
+                            })
+                          }
+                        />
+                      }
+                      label="ضرب (×)"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={autoGenConfig.operations.divide}
+                          onChange={(e) =>
+                            setAutoGenConfig({
+                              ...autoGenConfig,
+                              operations: {
+                                ...autoGenConfig.operations,
+                                divide: e.target.checked,
+                              },
+                            })
+                          }
+                        />
+                      }
+                      label="قسمة (÷)"
+                    />
+                  </Box>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    style={{ marginTop: '16px' }}
+                    onClick={handleAutoGeneration}
+                  >
+                    توليد الأسئلة تلقائياً
+                  </Button>
+                  {autoGenPreview.length > 0 && (
+                    <Card style={{ marginTop: '16px', padding: '10px' }}>
+                      <Typography variant="h6" gutterBottom>
+                        تم توليد {autoGenPreview.length} من الأسئلة، راجعها
+                        أولاً
+                      </Typography>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>المسألة</TableCell>
+                            <TableCell>الإجابة الصحيحة</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {autoGenPreview.map((q, idx) => {
+                            const expression = `${q.numbers[0].value} ${q.operations[0]} ${q.numbers[1].value}`;
+                            return (
+                              <TableRow key={idx}>
+                                <TableCell>{expression}</TableCell>
+                                <TableCell>{q.correctAnswer}</TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                      <Box mt={2} display="flex" justifyContent="space-between">
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={handleConfirmAutoGen}
+                        >
+                          تأكيد الأسئلة
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="secondary"
+                          onClick={handleDiscardAutoGen}
+                        >
+                          تجاهل
+                        </Button>
+                      </Box>
+                    </Card>
+                  )}
+                </Card>
+              )}
               <Button
                 variant="contained"
                 color="primary"
                 fullWidth
-                onClick={handleAddQuestion}
+                onClick={handleCreateExam}
                 style={styles.button}
               >
-                {t('adminDashboard.addQuestion')}
+                {t('adminDashboard.scheduleExam')}
               </Button>
             </CardContent>
           </Card>
         </Grid>
-
+        {questionData.generationMethod === 'manual' && (
+          <Grid item xs={12} md={6}>
+            <Card style={styles.card}>
+              <CardContent>
+                <Typography variant="h5" gutterBottom style={styles.cardTitle}>
+                  {t('adminDashboard.addQuestion')}
+                </Typography>
+                {currentQuestion.numbers.map((num) => (
+                  <div key={num.id} style={styles.optionContainer}>
+                    <TextField
+                      label={`${t('adminDashboard.number')} ${num.id}`}
+                      fullWidth
+                      value={num.value}
+                      onChange={(e) =>
+                        handleNumberChange(num.id, e.target.value)
+                      }
+                      style={styles.input}
+                    />
+                    {num.id > 1 && (
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleRemoveNumber(num.id)}
+                        style={styles.iconButton}
+                      >
+                        <RemoveCircleOutline />
+                      </IconButton>
+                    )}
+                  </div>
+                ))}
+                {currentQuestion.numbers.length > 1 &&
+                  currentQuestion.numbers.length - 1 ===
+                    currentQuestion.operations.length &&
+                  currentQuestion.numbers.map((_, index) =>
+                    index < currentQuestion.numbers.length - 1 ? (
+                      <Select
+                        key={`operation-${index}`}
+                        value={currentQuestion.operations[index] || ''}
+                        onChange={(e) =>
+                          handleOperationChange(index, e.target.value)
+                        }
+                        displayEmpty
+                        fullWidth
+                        style={styles.input}
+                      >
+                        <MenuItem value="">
+                          {t('adminDashboard.selectOperation')}
+                        </MenuItem>
+                        <MenuItem value="+">
+                          {t('operations.addition')}
+                        </MenuItem>
+                        <MenuItem value="-">
+                          {t('operations.subtraction')}
+                        </MenuItem>
+                        <MenuItem value="*">
+                          {t('operations.multiplication')}
+                        </MenuItem>
+                        <MenuItem value="/">
+                          {t('operations.division')}
+                        </MenuItem>
+                      </Select>
+                    ) : null
+                  )}
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={handleAddNumber}
+                  style={styles.addButton}
+                >
+                  {t('adminDashboard.addNumber')}
+                </Button>
+                <TextField
+                  label={t('adminDashboard.correctAnswer')}
+                  fullWidth
+                  value={currentQuestion.correctAnswer}
+                  disabled
+                  style={styles.input}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  onClick={handleAddQuestion}
+                  style={styles.button}
+                >
+                  {t('adminDashboard.addQuestion')}
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
         <Grid item xs={12}>
           <Card style={styles.card}>
             <CardContent>
@@ -633,7 +875,7 @@ const AdminDashboard = () => {
                 </TableHead>
                 <TableBody>
                   {exams.map((exam) => (
-                    <TableRow key={exam.id}>
+                    <TableRow key={exam._id}>
                       <TableCell>{exam.ageGroup}</TableCell>
                       <TableCell>{exam.class}</TableCell>
                       <TableCell>{exam.startDateTime}</TableCell>
@@ -659,8 +901,6 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
         </Grid>
-
-
         {openModal && (
           <Modal open={openModal} onClose={() => setOpenModal(false)}>
             <Box style={styles.modalBox}>
@@ -670,8 +910,8 @@ const AdminDashboard = () => {
                   : t('adminDashboard.viewExam')}
               </Typography>
               {modalAction === 'edit' && selectedExam && (
- <div style={styles.scrollableContent}>   
-                <TextField
+                <div style={styles.scrollableContent}>
+                  <TextField
                     label={t('adminDashboard.ageGroup')}
                     value={selectedExam.ageGroup}
                     onChange={(e) =>
@@ -877,48 +1117,44 @@ const AdminDashboard = () => {
                         disabled
                         style={styles.input}
                       />
-                <Button
-  variant="outlined"
-  color="secondary"
-  onClick={async () => {
-    try {
-      const token = localStorage.getItem('token'); // Retrieve the token
-      if (!token) {
-        alert('Authentication token is missing. Please log in again.');
-        return;
-      }
-
-      // Send a DELETE request to the backend
-      const response = await axios.delete(
-        `https://exam-server-psi.vercel.app/api/exam/${selectedExam._id}/question/${idx}`, // Backend API URL
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Add Bearer token
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-const id=  response.data.exam._id;
-      // Update the selected exam questions after successful deletion
-      dispatch(
-        updateExam({
-        id,
-          updatedExam: response.data.exam, 
-        })
-      );
-  
-      setSelectedExam(response.data.exam);
-      alert('Question deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting question:', error);
-      alert('Failed to delete the question. Please try again.');
-    }
-  }}
-  style={{ marginTop: '10px' }}
->
-  {t('adminDashboard.deleteQuestion')}
-</Button>
-
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={async () => {
+                          try {
+                            const token = localStorage.getItem('token');
+                            if (!token) {
+                              alert(
+                                'Authentication token is missing. Please log in again.'
+                              );
+                              return;
+                            }
+                            const response = await axios.delete(
+                              `https://exam-server-psi.vercel.app/api/exam/${selectedExam._id}/question/${idx}`,
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${token}`,
+                                  'Content-Type': 'application/json',
+                                },
+                              }
+                            );
+                            const updatedExam = response.data.exam;
+                            dispatch(
+                              updateExam({ id: updatedExam._id, updatedExam })
+                            );
+                            setSelectedExam(updatedExam);
+                            alert('Question deleted successfully!');
+                          } catch (error) {
+                            console.error('Error deleting question:', error);
+                            alert(
+                              'Failed to delete the question. Please try again.'
+                            );
+                          }
+                        }}
+                        style={{ marginTop: '10px' }}
+                      >
+                        {t('adminDashboard.deleteQuestion')}
+                      </Button>
                     </div>
                   ))}
                   <Button
@@ -940,18 +1176,6 @@ const id=  response.data.exam._id;
 };
 
 const styles = {
-  
-  modalTitle: {
-    textAlign: 'center',
-    fontWeight: 700,
-    color: '#333333',
-  },
-  input: {
-    marginBottom: '16px',
-  },
-  button: {
-    marginTop: '16px',
-  },
   container: {
     background:
       'linear-gradient(135deg, rgba(25, 118, 210, 0.9), rgba(37, 206, 209, 0.8))',
@@ -976,9 +1200,7 @@ const styles = {
     fontWeight: '500',
     color: '#1565c0',
   },
-  input: {
-    marginBottom: '15px',
-  },
+  input: { marginBottom: '15px' },
   button: {
     fontWeight: 'bold',
     marginTop: '15px',
@@ -986,77 +1208,42 @@ const styles = {
     color: '#fff',
     padding: '10px',
     borderRadius: '10px',
-    '&:hover': {
-      backgroundColor: '#0d47a1',
-    },
+    '&:hover': { backgroundColor: '#0d47a1' },
   },
   optionContainer: {
     display: 'flex',
     alignItems: 'center',
     marginBottom: '10px',
   },
-  iconButton: {
-    marginLeft: '10px',
-  },
-  addButton: {
-    marginBottom: '15px',
-  },
+  iconButton: { marginLeft: '10px' },
+  addButton: { marginBottom: '15px' },
   modalBox: {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '90%', // Adaptable to different screen sizes
-    maxWidth: '600px', // Limit maximum width for large screens
-    maxHeight: '80vh', // Constrain height for better usability
-    backgroundColor: '#ffffff', // Clean, professional white background
-    borderRadius: '12px', // Rounded corners for a modern feel
-    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)', // Deep shadow for depth
-    padding: '24px', // Comfortable padding for content spacing
+    width: '90%',
+    maxWidth: '600px',
+    maxHeight: '80vh',
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
+    padding: '24px',
     display: 'flex',
     flexDirection: 'column',
-    overflowY: 'auto', // Allow vertical scrolling for large content
-    border: '1px solid #e0e0e0', // Subtle border for structure
-    zIndex: 1050, // Ensure it stays above other elements
-    animation: 'fadeIn 0.3s ease', // Smooth fade-in animation
-  },
-  
-  // Add this keyframes animation for the smooth effect
-  scrollableContent: {
-    maxHeight: '70vh', // Constrain content height within the modal
     overflowY: 'auto',
-    padding: '12px', // Prevent content from touching the scrollbar
-    marginRight: '-12px', // Align scrollbar visually
-    scrollbarColor: '#1565c0 #e0e0e0', // Custom scrollbar colors
-    scrollbarWidth: 'thin', // Makes the scrollbar thin and modern
+    border: '1px solid #e0e0e0',
+    zIndex: 1050,
+    animation: 'fadeIn 0.3s ease',
   },
-  
-  // Custom Scroll Style (Add this for modern and cross-browser scroll aesthetics)
-  '::-webkit-scrollbar': {
-    width: '8px', // Width of the scrollbar
+  scrollableContent: {
+    maxHeight: '70vh',
+    overflowY: 'auto',
+    padding: '12px',
+    marginRight: '-12px',
+    scrollbarColor: '#1565c0 #e0e0e0',
+    scrollbarWidth: 'thin',
   },
-  
-  '::-webkit-scrollbar-thumb': {
-    backgroundColor: '#1565c0', // Scroll thumb color
-    borderRadius: '8px', // Rounded scroll thumb
-    border: '2px solid #ffffff', // Adds a white space around the thumb
-  },
-  
-  '::-webkit-scrollbar-thumb:hover': {
-    backgroundColor: '#0d47a1', // Darker shade on hover
-  },
-  
-  '::-webkit-scrollbar-track': {
-    backgroundColor: '#f5f5f5', // Subtle track color for contrast
-    borderRadius: '8px',
-  },
-  
-  questionEdit: {
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: '10px',
-  },
-}; 
-
+};
 
 export default AdminDashboard;
