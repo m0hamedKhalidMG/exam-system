@@ -98,11 +98,13 @@ const AdminDashboard = () => {
   });
 
   // ------------------------------------------
-  //  AUTOMATIC QUESTION CREATION CONFIG
+  //  AUTOMATIC QUESTION CONFIGURATION
   // ------------------------------------------
+  // الحقول الآن تُحدد عدد الديجيت لكل رقم، وعدد الأرقام في السؤال
   const [autoGenConfig, setAutoGenConfig] = useState({
-    minNumber: 0,
-    maxNumber: 9,
+    minDigits: 1, // أدنى عدد ديجيت (لا يقل عن 1)
+    maxDigits: 2, // أعلى عدد ديجيت (لا يقل عن minDigits)
+    numberCount: 2, // عدد الأرقام في السؤال (الحد الأدنى 2)
     questionsPerPage: 5,
     numberOfPages: 1,
     operations: {
@@ -206,48 +208,76 @@ const AdminDashboard = () => {
   };
 
   // ------------------------------------------
-  //  HANDLERS: AUTOMATIC QUESTION
+  //  HANDLERS: AUTOMATIC QUESTION GENERATION
   // ------------------------------------------
+  // نستخدم الحقول الجديدة لتوليد كل سؤال بعدد الأرقام المحدد،
+  // ولكل رقم يتم اختيار عدد ديجيت عشوائي بين minDigits وmaxDigits
   const handleAutoGeneration = () => {
     const {
-      minNumber,
-      maxNumber,
+      minDigits,
+      maxDigits,
+      numberCount,
       questionsPerPage,
       numberOfPages,
       operations,
     } = autoGenConfig;
-    const ops = [];
-    if (operations.plus) ops.push('+');
-    if (operations.minus) ops.push('-');
-    if (operations.multiply) ops.push('*');
-    if (operations.divide) ops.push('/');
+    // التأكد من أن minDigits لا يقل عن 1
+    const validMinDigits = Math.max(1, minDigits);
+    // التأكد من أن maxDigits لا يقل عن validMinDigits
+    const validMaxDigits =
+      maxDigits < validMinDigits ? validMinDigits : maxDigits;
 
-    if (ops.length === 0) {
+    const allowedOps = [];
+    if (operations.plus) allowedOps.push('+');
+    if (operations.minus) allowedOps.push('-');
+    if (operations.multiply) allowedOps.push('*');
+    if (operations.divide) allowedOps.push('/');
+
+    if (allowedOps.length === 0) {
       alert('Please select at least one operation for auto-generation.');
       return;
     }
 
-    const totalQuestionsToGenerate = questionsPerPage * numberOfPages;
+    // التأكد من أن عدد الأسئلة في كل صفحة وعدد الصفحات لا يقل عن 1
+    const validQuestionsPerPage = Math.max(1, questionsPerPage);
+    const validNumberOfPages = Math.max(1, numberOfPages);
+
+    const totalQuestionsToGenerate = validQuestionsPerPage * validNumberOfPages;
     const generatedQuestions = [];
 
+    // دالة توليد رقم بعدد ديجيت معين
+    const generateNumberWithDigits = (digits) => {
+      const min = Math.pow(10, digits - 1);
+      const max = Math.pow(10, digits) - 1;
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+
     for (let i = 0; i < totalQuestionsToGenerate; i++) {
-      const randomNum1 =
-        Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
-      const randomNum2 =
-        Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
-      const randomOp = ops[Math.floor(Math.random() * ops.length)];
+      const numbers = [];
+      for (let j = 0; j < numberCount; j++) {
+        // اختيار عدد ديجيت عشوائي بين validMinDigits و validMaxDigits
+        const digits =
+          Math.floor(Math.random() * (validMaxDigits - validMinDigits + 1)) +
+          validMinDigits;
+        numbers.push({
+          id: j + 1,
+          value: generateNumberWithDigits(digits).toString(),
+        });
+      }
+      const ops = [];
+      for (let j = 0; j < numberCount - 1; j++) {
+        const randomOp =
+          allowedOps[Math.floor(Math.random() * allowedOps.length)];
+        ops.push(randomOp);
+      }
 
-      const questionObj = {
-        numbers: [
-          { id: 1, value: randomNum1.toString() },
-          { id: 2, value: randomNum2.toString() },
-        ],
-        operations: [randomOp],
-        correctAnswer: '',
-      };
-
+      const questionObj = { numbers, operations: ops, correctAnswer: '' };
       try {
-        const expression = `${randomNum1} ${randomOp} ${randomNum2}`;
+        const expression = numbers
+          .map((num, index) =>
+            index < ops.length ? `${num.value} ${ops[index]}` : num.value
+          )
+          .join(' ');
         const evalResult = eval(expression);
         questionObj.correctAnswer = evalResult.toString();
       } catch {
@@ -288,16 +318,13 @@ const AdminDashboard = () => {
       alert('Please add at least one question (manually or automatically).');
       return;
     }
-
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         alert('Authentication token is missing. Please log in again.');
         return;
       }
-
       const examData = { ...questionData };
-
       const response = await axios.post(
         'https://exam-server-psi.vercel.app/api/exam/create',
         examData,
@@ -308,7 +335,6 @@ const AdminDashboard = () => {
           },
         }
       );
-
       if (response.status === 201) {
         dispatch(addExam(response.data.exam));
         alert(t('adminDashboard.examScheduled'));
@@ -428,7 +454,7 @@ const AdminDashboard = () => {
         {t('adminDashboard.title')}
       </Typography>
       <Grid container spacing={4}>
-        {/* CREATE EXAM (LEFT) */}
+        {/* CREATE EXAM (LEFT SIDE) */}
         <Grid item xs={12} md={6}>
           <Card style={styles.card}>
             <CardContent>
@@ -574,30 +600,55 @@ const AdminDashboard = () => {
                     إعداد الأسئلة التلقائية
                   </Typography>
                   <Grid container spacing={2}>
-                    <Grid item xs={6}>
+                    <Grid item xs={4}>
                       <TextField
-                        label="الحد الأدنى للرقم"
+                        label="أقل ديجيت"
                         type="number"
                         fullWidth
-                        value={autoGenConfig.minNumber}
-                        onChange={(e) =>
+                        value={autoGenConfig.minDigits}
+                        onChange={(e) => {
+                          const newVal = Math.max(
+                            1,
+                            parseInt(e.target.value, 10)
+                          );
                           setAutoGenConfig({
                             ...autoGenConfig,
-                            minNumber: parseInt(e.target.value, 10),
-                          })
-                        }
+                            minDigits: newVal,
+                          });
+                        }}
                       />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={4}>
                       <TextField
-                        label="الحد الأقصى للرقم"
+                        label="أعلى ديجيت"
                         type="number"
                         fullWidth
-                        value={autoGenConfig.maxNumber}
+                        value={autoGenConfig.maxDigits}
+                        onChange={(e) => {
+                          const newVal = parseInt(e.target.value, 10);
+                          setAutoGenConfig({
+                            ...autoGenConfig,
+                            maxDigits:
+                              newVal < autoGenConfig.minDigits
+                                ? autoGenConfig.minDigits
+                                : newVal,
+                          });
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <TextField
+                        label="عدد الأرقام في السؤال"
+                        type="number"
+                        fullWidth
+                        value={autoGenConfig.numberCount}
                         onChange={(e) =>
                           setAutoGenConfig({
                             ...autoGenConfig,
-                            maxNumber: parseInt(e.target.value, 10),
+                            numberCount: Math.max(
+                              2,
+                              parseInt(e.target.value, 10)
+                            ),
                           })
                         }
                       />
@@ -611,7 +662,10 @@ const AdminDashboard = () => {
                         onChange={(e) =>
                           setAutoGenConfig({
                             ...autoGenConfig,
-                            questionsPerPage: parseInt(e.target.value, 10),
+                            questionsPerPage: Math.max(
+                              1,
+                              parseInt(e.target.value, 10)
+                            ),
                           })
                         }
                       />
@@ -625,7 +679,10 @@ const AdminDashboard = () => {
                         onChange={(e) =>
                           setAutoGenConfig({
                             ...autoGenConfig,
-                            numberOfPages: parseInt(e.target.value, 10),
+                            numberOfPages: Math.max(
+                              1,
+                              parseInt(e.target.value, 10)
+                            ),
                           })
                         }
                       />
@@ -713,8 +770,7 @@ const AdminDashboard = () => {
                   {autoGenPreview.length > 0 && (
                     <Card style={{ marginTop: '16px', padding: '10px' }}>
                       <Typography variant="h6" gutterBottom>
-                        تم توليد {autoGenPreview.length} من الأسئلة، راجعها
-                        أولاً
+                        تم توليد {autoGenPreview.length} سؤال، يرجى المراجعة
                       </Typography>
                       <Table>
                         <TableHead>
@@ -725,7 +781,13 @@ const AdminDashboard = () => {
                         </TableHead>
                         <TableBody>
                           {autoGenPreview.map((q, idx) => {
-                            const expression = `${q.numbers[0].value} ${q.operations[0]} ${q.numbers[1].value}`;
+                            const expression = q.numbers
+                              .map((num, index) =>
+                                index < q.operations.length
+                                  ? `${num.value} ${q.operations[index]}`
+                                  : num.value
+                              )
+                              .join(' ');
                             return (
                               <TableRow key={idx}>
                                 <TableCell>{expression}</TableCell>
@@ -1196,10 +1258,7 @@ const styles = {
     boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)',
     padding: '20px',
   },
-  cardTitle: {
-    fontWeight: '500',
-    color: '#1565c0',
-  },
+  cardTitle: { fontWeight: '500', color: '#1565c0' },
   input: { marginBottom: '15px' },
   button: {
     fontWeight: 'bold',
